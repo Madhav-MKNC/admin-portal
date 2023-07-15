@@ -1,7 +1,9 @@
+/* Global styles */
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
 }
+
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -10,36 +12,85 @@ body {
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 h1 {
     text-align: center;
     margin-bottom: 20px;
 }
-.file-list {
-    margin-top: 20px;
-}
-.file-list ul {
-    list-style: none;
-    padding: 0;
-}
-.file-list li {
-    margin-bottom: 10px;
-}
-.file-list a {
+
+a {
     text-decoration: none;
-    color: #007bff;
-    margin-right: 10px;
+    color: #007BFF;
 }
-.file-list a:hover {
-    text-decoration: underline;
+
+a:hover {
+    color: #0056b3;
 }
-.upload-section {
-    border-top: 1px solid #ccc;
-    padding-top: 20px;
+
+/* Dashboard-specific styles */
+.upload-section, .file-list {
+    margin-bottom: 20px;
 }
-.upload-section h2 {
-    margin-bottom: 10px;
+
+.upload-section h2, .file-list h2 {
+    border-bottom: 2px solid #007BFF;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
 }
+
+.upload-section form {
+    display: flex;
+    align-items: center;
+}
+
+.upload-section input[type="file"] {
+    flex: 1;
+    padding: 5px;
+}
+
+.upload-section button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #007BFF;
+    color: #fff;
+    cursor: pointer;
+}
+
+.upload-section button:hover {
+    background-color: #0056b3;
+}
+
 .messages {
     margin-top: 10px;
-    color: red;
+}
+
+.file-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.file-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.file-list li a {
+    flex: 1;
+    padding: 5px;
+}
+
+.file-list li a:last-child {
+    margin-left: 10px;
+    color: #dc3545;
+}
+
+.file-list li a:last-child:hover {
+    color: #b3001f;
+}
+
+.logout-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
 }

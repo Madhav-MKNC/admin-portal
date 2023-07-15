@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
 import json
@@ -102,6 +102,12 @@ def dashboard():
 
     files = os.listdir(app.config['UPLOAD_FOLDER'])
     return render_template('dashboard.html', files=files)
+
+# uploaded files here
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    # Serve the uploaded file directly from the server
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # upload
 @app.route('/upload', methods=['POST'])
