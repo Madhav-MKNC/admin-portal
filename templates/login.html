@@ -2,18 +2,25 @@
 <html>
 <head>
     <title>Admin Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login_style.css') }}">
 </head>
 <body>
-    <h1>Admin Login</h1>
-    {% if error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
-    <form method="post" action="/login">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
-        <input type="submit" value="Login">
-    </form>
+    <div class="container">
+        <h1>Admin Login</h1>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="post" action="/login">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+
+    <script>
+        // You can add JavaScript here if needed
+    </script>
 </body>
 </html>
