@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.file-list {
+    margin-top: 20px;
+}
+.file-list ul {
+    list-style: none;
+    padding: 0;
+}
+.file-list li {
+    margin-bottom: 10px;
+}
+.file-list a {
+    text-decoration: none;
+    color: #007bff;
+    margin-right: 10px;
+}
+.file-list a:hover {
+    text-decoration: underline;
+}
+.upload-section {
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+}
+.upload-section h2 {
+    margin-bottom: 10px;
+}
+.messages {
+    margin-top: 10px;
+    color: red;
+}
