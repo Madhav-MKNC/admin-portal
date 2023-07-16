@@ -72,6 +72,7 @@ Routes below:
 /dashboard
 /upload
 /delete
+/chatbot
 /logout
 """
 
