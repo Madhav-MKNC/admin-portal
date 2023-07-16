@@ -20,6 +20,10 @@ app = Flask(__name__)
 # secret key
 app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random key in a production environment
 
+# URL to the chatbot
+CHATBOT_URL = "http://localhost:8081"
+print(f"\n[+] Chatbot URL is: {CHATBOT_URL}\n")
+
 # Folder to store uploaded files
 app.config['UPLOAD_FOLDER'] = 'uploads'
 if not os.path.exists('./uploads'):
@@ -151,6 +155,11 @@ def logout():
     # Clear the authenticated status from the session
     session.pop('authenticated', None)
     return redirect(url_for('login'))
+
+# chatbot
+@app.route('/chatbot')
+def chatbot_redirect():
+    return redirect(CHATBOT_URL)
 
 
 # run server
