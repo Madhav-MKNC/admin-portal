@@ -67,13 +67,13 @@ def allowed_file(filename):
 
 """
 Routes below:
-/
-/login
-/dashboard
-/upload
-/delete
-/chatbot
-/logout
+/           => index
+/login      => admin login page
+/dashboard  => admin dashboard
+/upload     => for uploading files
+/delete     => for deleting a uploaded file
+/chatbot    => redirect to chatbot
+/logout     => admin logout
 """
 
 # index
