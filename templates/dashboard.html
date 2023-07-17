@@ -5,14 +5,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_style.css') }}">
 </head>
 <body>
-    <h1>Welcome to the Admin Dashboard</h1>
-    <div class="container">
-        <h1>Admin Dashboard</h1>
+    <div class="header">
+        <h1 class="title">Welcome to the Admin Dashboard</h1>
+        <a href="/" class="home-link">Home</a>
+        <div class="logout-container">
+            <a class="logout-link" href="/logout">Logout</a>
+        </div>
+    </div>
 
+    <div class="container">
         <div class="upload-section">
             <h2>Upload File</h2>
             <form method="post" action="/upload" enctype="multipart/form-data">
-                <input type="file" name="file" id="file" required>
+                <input type="file" name="file" id="file" required multiple>
                 <button type="submit">Upload</button>
             </form>
 
@@ -31,7 +36,7 @@
                     </div>
                 {% endif %}
             {% endwith %}
-        </div>     
+        </div>
 
         <div class="file-list">
             <h2>Uploaded Files</h2>
@@ -40,7 +45,9 @@
                     {% for filename in files %}
                         <li>
                             <a href="{{ url_for('uploaded_file', filename=filename) }}" target="_blank">{{ filename }}</a>
-                            <a href="{{ url_for('delete', filename=filename) }}" onclick="return confirm('Are you sure you want to delete this file?')">Delete</a>
+                            <form method="post" action="{{ url_for('delete', filename=filename) }}" onsubmit="return confirm('Are you sure you want to delete this file?')">
+                                <button type="submit">Delete</button>
+                            </form>
                         </li>
                     {% endfor %}
                 </ul>
@@ -49,11 +56,15 @@
             {% endif %}
         </div>
     </div>
-    <div class="logout-container">
-        <a class="logout-link" href="/logout">Logout</a>
-    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2023 Chatbot. All rights reserved.</p>
+            <ul class="footer-menu">
+                <!-- Add your footer links here -->
+                <li><a href="https://github.com/madhav-mknc/admin-portal">Github</a></li>
+            </ul>
+        </div>
+    </footer>
 </body>
 </html>
-
-
-
