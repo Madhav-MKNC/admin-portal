@@ -13,5 +13,15 @@
         <h3>Interactive Chatbot</h3>
         <a class="chatbot-link" href="/chatbot">Start Chatbot</a>
     </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="error">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 </body>
 </html>

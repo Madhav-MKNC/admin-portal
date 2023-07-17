@@ -131,6 +131,10 @@ def handle_url():
 # chatbot
 @app.route('/chatbot')
 def chatbot_redirect():
+    if not valid_url(CHATBOT_URL):
+        error = f'Unable to reach chatbot url = {CHATBOT_URL}'
+        flash(error)
+        return render_template('index.html')
     return redirect(CHATBOT_URL)
 
 # logout

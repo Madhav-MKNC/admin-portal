@@ -56,3 +56,8 @@ h3 {
 .chatbot-link:hover {
     background-color: #218838;
 }
+
+.error {
+    color: red;
+    margin-top: 10px;
+}
