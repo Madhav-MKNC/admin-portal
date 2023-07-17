@@ -1,68 +1,54 @@
-# Chat Bot Web Application
+# admin-portal
+Admin dashboard for managing data for AI-chatbot
 
-The Chat Bot Web Application is a web-based interactive chatbot that utilizes Large Language Models (LLMs) and Langchain technology to interact with documents and data managed on the Admin Dashboard. This application allows users to have natural language conversations with the chatbot, making it a powerful tool for retrieving information, answering questions, and assisting users with various tasks.
 
-## Features
+# Project Development Details
 
-- Natural Language Interaction: The chatbot uses state-of-the-art Large Language Models (LLMs) to understand and respond to user queries in a human-like manner.
-- Seamless Integration: The chatbot is seamlessly integrated with the Admin Dashboard, enabling access to documents and data managed by the administrator.
-- Interactive Communication: Users can have real-time interactive conversations with the chatbot, making it a user-friendly and engaging experience.
-- Advanced Search: The chatbot utilizes Langchain technology to perform advanced searches across documents, ensuring accurate and relevant responses to user queries.
-- User-Friendly Interface: The web application offers an intuitive and user-friendly interface, making it accessible to users with varying levels of technical expertise.
+## Project Description
+This project is an Admin Portal for managing data for an AI chatbot. It allows administrators to log in, upload, and delete files. The application is built using Flask, a popular Python web framework, and it provides a simple web interface to interact with the chatbot's data.
 
-## Getting Started
+## Prerequisites
+Before running the application, ensure the following prerequisites are met:
 
-To set up and run the Chat Bot Web Application, follow these steps:
+1. Python 3.x is installed on the system.
+2. Required Python packages are installed. You can install them using `pip install -r requirements.txt`.
+3. The environment variables `FLASK_SECRET_KEY` and any other required variables should be set.
 
-1. **Clone the Repository**: Clone this repository to your local machine.
+## Project Structure
+The project consists of the following files:
 
-2. **Install Dependencies**: Ensure you have Python and the required libraries installed. Use the following command to install the necessary dependencies:
+1. `app.py`: The main Flask application file containing the server logic.
+2. `admin_users.json`: A JSON file containing a list of admin users' credentials.
+3. `uploads/`: A folder to store the uploaded files.
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Installation and Setup
+1. Clone the repository from GitHub.
+2. Install the required dependencies using `pip install -r requirements.txt`.
+3. Set the environment variable `FLASK_SECRET_KEY` to a strong random key for session management and security. **Note:** In a production environment, ensure this key is kept secret and not hard-coded.
+4. Ensure the `admin_users.json` file contains valid admin user credentials.
 
-3. **Set Environment Variables**: Create a `.env` file and set the following environment variables:
+## How to Run
+To start the Flask server, run the `start_server()` function in the `app.py` file. The server will run on `http://0.0.0.0:80/` and listen to incoming requests.
 
-   ```plaintext
-   FLASK_SECRET_KEY=your_secret_key_here
-   ```
+```bash
+python app.py
+```
 
-   Replace `your_secret_key_here` with a strong random key for Flask session management.
+## Routes
+The Flask application exposes the following routes:
 
-4. **Load Admin Users**: Prepare an `users.json` file containing the admin user data, and place it in the root directory of the application. The JSON file should have the following format:
+1. `/`: The homepage of the Admin Portal.
+2. `/login`: The login page for administrators to authenticate themselves.
+3. `/dashboard`: The main dashboard page where administrators can see the uploaded files and manage them.
+4. `/uploads/<filename>`: A route to serve uploaded files directly from the server.
+5. `/upload`: A route to upload files to the server.
+6. `/delete/<filename>`: A route to delete uploaded files from the server.
+7. `/logout`: A route to log out and clear the authenticated session.
 
-   ```json
-   [
-       {
-           "username": "user1",
-           "password": "password1"
-       },
-       {
-           "username": "user1",
-           "password": "password2"
-       },
-       // Add more users as needed
-   ]
-   ```
-
-   Make sure to replace `user1`, `user2`, etc., with actual usernames, and `password1`, `password2`, etc., with the passwords of the respective users.
-
-5. **Start the Application**: Run the Flask application using the following command:
-
-   ```bash
-   python app.py
-   ```
-
-   The application will be accessible at `http://localhost:8081`.
-
-## Usage
-
-**Chatbot Interaction**: To use the Chat Bot Web Application, go to `http://localhost:8081/chat`. Start interacting with the chatbot by typing your queries in natural language.
+## Important Notes
+1. The project uses Flask's built-in session management to store the authenticated status, which is not suitable for production environments. In a real-world application, consider using a more robust session management solution.
+2. The `allowed_file()` function allows only specific file types (txt, pdf, doc, docx, csv) to be uploaded. Modify the `ALLOWED_EXTENSIONS` set to include additional file types if required.
+3. In a production environment, it's crucial to ensure secure file uploads to prevent any potential security risks.
 
 ## License
-
-This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute it as per the terms of the license.
-
----
-*Note: Replace `http://localhost:8081` with the actual deployment URL if the application is hosted on a remote server.*
+This project is licensed under the [MIT License](LICENSE). Feel free to use and modify it according to your needs.
