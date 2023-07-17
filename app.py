@@ -90,26 +90,23 @@ def uploaded_file(filename):
 @login_required
 def upload():
     if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(url_for('dashboard'))
+        files = request.files.getlist('file')  # Get a list of uploaded files
         
-        file = request.files['file']
-
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(url_for('dashboard'))
-        
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            flash('File uploaded successfully')
-            return redirect(url_for('dashboard'))
-        
-        else:
-            flash('Invalid file type')
+        if not files:
+            flash('No files selected')
             return redirect(url_for('dashboard'))
 
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(UPLOAD_FOLDER, filename))
+            else:
+                flash('Invalid file type')
+                return redirect(url_for('dashboard'))
+
+        flash('Files uploaded successfully')
+        return redirect(url_for('dashboard'))
+        
 @app.route('/delete/<filename>')
 @login_required
 def delete(filename):
