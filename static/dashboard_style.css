@@ -36,9 +36,9 @@ a:hover {
 }
 
 /* Dashboard-specific styles */
-.upload-section, .file-list {
+/* .upload-section, .file-list {
     margin-bottom: 20px;
-}
+} */
 
 .upload-section h2, .file-list h2 {
     border-bottom: 2px solid #007BFF;
@@ -104,18 +104,25 @@ a:hover {
     color: #b3001f;
 }
 
-.logout-link {
+/* .logout-link {
     display: inline-block;
     padding: 10px 20px;
     background-color: #0056b3;
     color: #fff;
     text-decoration: none;
     border-radius: 5px;
+    position: relative;
 }
 
 .logout-link:hover {
     background-color: #007BFF;
 }
+
+.logout-container {
+    text-align: center;
+    margin-top: 30px;
+} */
+
 
 /* Additional styles for a more professional look */
 
@@ -160,9 +167,12 @@ a:hover {
     background-color: #dc3545;
 }
 
-.upload-section button:hover,
-.file-list button:hover {
+.upload-section button:hover {
     background-color: #0056b3;
+}
+
+.file-list button:hover {
+    background-color: red;
 }
 
 .file-list ul {
@@ -174,9 +184,10 @@ a:hover {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.logout-container {
-    text-align: center;
-    margin-top: 30px;
+.title {
+    font-size: 28px;
+    color: white;
+    margin: 0;
 }
 
 .header {
@@ -184,21 +195,30 @@ a:hover {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 30px;
-    background-color: #f9f9f9;
+    /* background-color: #f9f9f9; */
+    background-color: #0056b3;
     padding: 15px 30px;
     border-radius: 10px;
 }
 
-.title {
-    font-size: 28px;
-    color: #333;
-    margin: 0;
+/* .header-container {
+    text-align: center;
+    margin-top: 30px;
+} */
+
+.header-link {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0056b3;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    position: relative;
 }
 
-.home-link {
-    text-decoration: none;
-    color: #007BFF;
-    font-size: 16px;
+.header-link:hover {
+    background-color: #007BFF;
 }
 
 footer {
