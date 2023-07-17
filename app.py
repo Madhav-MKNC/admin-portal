@@ -5,8 +5,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
-import json
-import hashlib
+from utils import *
 from functools import wraps
 
 import os
@@ -18,37 +17,15 @@ load_dotenv()
 app = Flask(__name__)
 
 # secret key
-app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random key in a production environment
+# app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random key in a production environment
+app.secret_key = str(unique_id()).replace("-","")
 
 # URL to the chatbot
 CHATBOT_URL = "http://localhost:8081"
 print(f"\n[+] Chatbot URL is: {CHATBOT_URL}\n")
 
-# Folder to store uploaded files
-app.config['UPLOAD_FOLDER'] = 'uploads'
-if not os.path.exists('./uploads'):
-    os.makedirs('uploads')
 
-# Load admin users from the JSON file
-ADMIN_USERS_FILE = 'admin_users.json'
-
-def load_admin_users():
-    admin_users = []
-    if os.path.exists(ADMIN_USERS_FILE):
-        with open(ADMIN_USERS_FILE, 'r') as file:
-            admin_users = json.load(file)
-    return admin_users
-
-ADMIN_USERS = load_admin_users()
-
-
-def is_authenticated(username, password):
-    # Check if the provided username and password match any admin user
-    for admin_user in ADMIN_USERS:
-        if admin_user['username'] == username and hashlib.sha256(admin_user['password'].encode()).hexdigest() == hashlib.sha256(password.encode()).hexdigest():
-            return True
-    return False
-
+# only logged in access
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -57,16 +34,10 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-def allowed_file(filename):
-    # Check if the uploaded file has an allowed extension (customize this list as needed)
-    ALLOWED_EXTENSIONS = {'txt', 'pdf', 'doc', 'docx'}
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-
-
+# Routes below:
 """
-Routes below:
 /           => index
 /login      => admin login page
 /dashboard  => admin dashboard
@@ -105,14 +76,14 @@ def dashboard():
     if not session.get('authenticated'):
         return redirect(url_for('login'))
 
-    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    files = os.listdir(UPLOAD_FOLDER)
     return render_template('dashboard.html', files=files)
 
 # uploaded files here
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     # Serve the uploaded file directly from the server
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 # upload
 @app.route('/upload', methods=['POST'])
@@ -131,7 +102,7 @@ def upload():
         
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
             flash('File uploaded successfully')
             return redirect(url_for('dashboard'))
         
@@ -142,7 +113,7 @@ def upload():
 @app.route('/delete/<filename>')
 @login_required
 def delete(filename):
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
     if os.path.exists(filepath):
         os.remove(filepath)
         flash('File deleted successfully')
@@ -150,17 +121,27 @@ def delete(filename):
         flash('File not found')
     return redirect(url_for('dashboard'))
 
+# New route to handle URL submission
+@app.route('/handle_url', methods=['POST'])
+@login_required
+def handle_url():
+    if request.method == 'POST':
+        url = request.form.get('url')
+        result_message = handle_urls(url)
+        flash(result_message)
+    return redirect(url_for('dashboard'))
+
+# chatbot
+@app.route('/chatbot')
+def chatbot_redirect():
+    return redirect(CHATBOT_URL)
+
 # logout
 @app.route('/logout')
 def logout():
     # Clear the authenticated status from the session
     session.pop('authenticated', None)
     return redirect(url_for('login'))
-
-# chatbot
-@app.route('/chatbot')
-def chatbot_redirect():
-    return redirect(CHATBOT_URL)
 
 
 # run server

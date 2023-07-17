@@ -15,6 +15,13 @@
                 <input type="file" name="file" id="file" required>
                 <button type="submit">Upload</button>
             </form>
+
+            <h2>Handle URL</h2>
+            <form method="post" action="/handle_url">
+                <input type="text" name="url" id="url" placeholder="Enter URL" required>
+                <button type="submit">Fetch Data</button>
+            </form>
+
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     <div class="messages">
@@ -24,7 +31,7 @@
                     </div>
                 {% endif %}
             {% endwith %}
-        </div>
+        </div>     
 
         <div class="file-list">
             <h2>Uploaded Files</h2>
