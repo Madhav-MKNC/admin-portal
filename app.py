@@ -47,14 +47,19 @@ def login_required(f):
 /logout     => admin logout
 """
 
+
 # index
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 # login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if session.get('authenticated'):
+        return redirect(url_for("dashboard"))
+    
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -68,6 +73,7 @@ def login():
             return render_template('login.html', error=error)
     return render_template('login.html')
 
+
 # dashboard
 @app.route('/dashboard')
 @login_required
@@ -79,11 +85,13 @@ def dashboard():
     files = os.listdir(UPLOAD_FOLDER)
     return render_template('dashboard.html', files=files)
 
+
 # uploaded files here
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     # Serve the uploaded file directly from the server
     return send_from_directory(UPLOAD_FOLDER, filename)
+
 
 # upload
 @app.route('/upload', methods=['POST'])
@@ -107,6 +115,7 @@ def upload():
         flash('Files uploaded successfully')
         return redirect(url_for('dashboard'))
 
+
 # delete an uploaded file  
 @app.route('/delete/<filename>')
 @login_required
@@ -119,20 +128,36 @@ def delete(filename):
         flash('File not found')
     return redirect(url_for('dashboard'))
 
+
 # upload files from google drive
 @app.route('/upload_google_drive', methods=['POST'])
 @login_required
 def upload_google_drive():
-    # Here, you would implement the logic to handle the Google Drive file upload.
-    # Since implementing the Google Drive integration requires OAuth 2.0 authentication and API integration,
-    # it goes beyond the scope of a simple file upload example.
+    try:
+        if 'file' not in request.files:
+            flash('No file selected')
+            return redirect(url_for('dashboard'))
 
-    # You can use the Google Drive API or a Google Drive SDK to integrate the functionality.
-    # It involves obtaining authorization, accessing the user's Google Drive, and uploading the file.
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(url_for('dashboard'))
 
-    # For the sake of this example, we'll just display a message indicating the feature is not implemented.
-    flash('Google Drive upload feature is not implemented yet.')
-    return redirect(url_for('dashboard'))
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(file_path)
+
+            file_id = upload_to_google_drive(file_path)
+            flash(f'File uploaded to Google Drive with ID: {file_id}')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid file type')
+            return redirect(url_for('dashboard'))
+
+    except Exception as e:
+        flash(f'Error uploading to Google Drive: {str(e)}')
+        return redirect(url_for('dashboard'))
 
 
 # To handle URL submission
@@ -145,6 +170,7 @@ def handle_url():
         flash(result_message)
     return redirect(url_for('dashboard'))
 
+
 # chatbot
 @app.route('/chatbot')
 def chatbot_redirect():
@@ -153,6 +179,7 @@ def chatbot_redirect():
         flash(error)
         return render_template('index.html')
     return redirect(CHATBOT_URL)
+
 
 # logout
 @app.route('/logout')

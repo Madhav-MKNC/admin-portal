@@ -6,6 +6,10 @@ import requests
 import hashlib
 from bs4 import BeautifulSoup
 from uuid import uuid4 as unique_id
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 
 # directory for data storage
 UPLOAD_FOLDER = "./uploads"
@@ -59,4 +63,33 @@ def handle_urls(url):
         return "Data Fetched Successfully"
     else:
         return "Failed to Fetch Data"
-    
+
+# Function to get Google Drive credentials using OAuth 2.0
+def get_google_drive_credentials():
+    # The scopes required for accessing Google Drive files
+    SCOPES = ['https://www.googleapis.com/auth/drive.file']
+    flow = InstalledAppFlow.from_client_secrets_file('client-secret.json', SCOPES)
+    credentials = flow.run_local_server(port=0)
+    return credentials
+
+# Function to upload file to Google Drive
+def upload_to_google_drive(file_path):
+    credentials = get_google_drive_credentials()
+    service = build('drive', 'v3', credentials=credentials)
+
+    file_metadata = {'name': os.path.basename(file_path)}
+    media = MediaFileUpload(file_path, resumable=True)
+
+    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    return file.get('id')
+
+# # Function to handle Google Drive authentication
+# def authenticate_google_drive():
+#     from google.oauth2.credentials import Credentials
+
+#     # Load credentials from the session
+#     creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
+
+#     # Build Google Drive service
+#     drive_service = build("drive", "v3", credentials=creds)
+#     return drive_service
