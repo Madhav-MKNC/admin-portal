@@ -106,7 +106,8 @@ def upload():
 
         flash('Files uploaded successfully')
         return redirect(url_for('dashboard'))
-        
+
+# delete an uploaded file  
 @app.route('/delete/<filename>')
 @login_required
 def delete(filename):
@@ -118,7 +119,23 @@ def delete(filename):
         flash('File not found')
     return redirect(url_for('dashboard'))
 
-# New route to handle URL submission
+# upload files from google drive
+@app.route('/upload_google_drive', methods=['POST'])
+@login_required
+def upload_google_drive():
+    # Here, you would implement the logic to handle the Google Drive file upload.
+    # Since implementing the Google Drive integration requires OAuth 2.0 authentication and API integration,
+    # it goes beyond the scope of a simple file upload example.
+
+    # You can use the Google Drive API or a Google Drive SDK to integrate the functionality.
+    # It involves obtaining authorization, accessing the user's Google Drive, and uploading the file.
+
+    # For the sake of this example, we'll just display a message indicating the feature is not implemented.
+    flash('Google Drive upload feature is not implemented yet.')
+    return redirect(url_for('dashboard'))
+
+
+# To handle URL submission
 @app.route('/handle_url', methods=['POST'])
 @login_required
 def handle_url():

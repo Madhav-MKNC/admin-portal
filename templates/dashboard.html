@@ -21,10 +21,16 @@
                 <button type="submit">Upload</button>
             </form>
 
+            <!-- New "Upload from Google Drive" button -->
+            <h2>Upload from Google Drive</h2>
+            <form method="post" action="/upload_google_drive">
+                <button type="submit">Upload from Google Drive</button>
+            </form>
+
             <h2>Handle URL</h2>
             <form method="post" action="/handle_url">
                 <input type="text" name="url" id="url" placeholder="Enter URL" required>
-                <button type="submit">Fetch Data</button>
+                <button type="submit">Fetch</button>
             </form>
 
             {% with messages = get_flashed_messages() %}
