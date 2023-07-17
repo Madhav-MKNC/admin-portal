@@ -44,6 +44,7 @@ The Flask application exposes the following routes:
 5. `/upload`: A route to upload files to the server.
 6. `/delete/<filename>`: A route to delete uploaded files from the server.
 7. `/logout`: A route to log out and clear the authenticated session.
+8. `/chatbot`: Redirect to chatbot.
 
 ## Important Notes
 1. The project uses Flask's built-in session management to store the authenticated status, which is not suitable for production environments. In a real-world application, consider using a more robust session management solution.
