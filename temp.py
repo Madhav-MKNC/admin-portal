@@ -123,3 +123,4 @@ if __name__ == "__main__":
 # # vectorstore = Pinecone(index, embeddings.embed_query, "text")
 # # vectorstore.add_texts("More text!")
 # """
+

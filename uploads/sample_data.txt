@@ -1,2 +1,0 @@
-This is a sample data
-The Value of XYZ is 5

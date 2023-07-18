@@ -4,11 +4,24 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from utils import load_and_split_document
 from langchain.embeddings.openai import OpenAIEmbeddings
 
 import pinecone
 from langchain.vectorstores import Pinecone
+
+
+from langchain.document_loaders import ( 
+    PyMuPDFLoader, 
+    TextLoader,
+    Docx2txtLoader, 
+    WebBaseLoader,
+    CSVLoader
+)
+from langchain.text_splitter import CharacterTextSplitter
+
+import pandas as pd
+from pathlib import Path
+from tqdm.auto import tqdm
 
 
 # Initialize pinecone
@@ -21,36 +34,64 @@ pinecone.init(
 index_name = os.environ["PINECONE_INDEX_NAME"]
 print("[+] Index name:",index_name)
 
-metadata_config = {
-    "indexed": ["source"]
-}
-
-pinecone.create_index(index_name,
-                      dimension=1535,
-                      metadata_config=metadata_config
-)
-
-
 # connecting to the index
 index = pinecone.GRPCIndex(index_name)
-index.describe_index_stats()
+print(index.describe_index_stats())
+embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
+# vectorstore = Pinecone(index, embeddings.embed_query, "text")
 
 # load and split documents
-documents = load_and_split_document("./uploads/sample_data.txt")
+def load_and_split_document(file_path):
+    file_extension = file_path.split('.')[-1].lower()
 
-# texts
-texts = []
-for _doc in documents:
-    texts.append(_doc.page_content)
+    if file_extension == "txt":
+        loader = TextLoader(file_path)
+    elif file_extension == "pdf":
+        loader = PyMuPDFLoader(file_path)
+    elif file_extension == "doc" or file_extension == "docx":
+        loader = Docx2txtLoader(file_path)
+    elif file_extension == "csv":
+        loader = CSVLoader(file_path)
+    elif file_extension == "url":
+        with open(file_path, 'r') as something:
+            url = something.read()
+        loader = WebBaseLoader(url)
 
-# embeddings
-embeddings = OpenAIEmbeddings(
-    openai_api_key=os.environ["OPENAI_API_KEY"]
-)
+    doc = loader.load()
+    docs = CharacterTextSplitter(chunk_size=512, chunk_overlap=10).split_documents(doc)
+    return docs
 
-# embedding texts
-res = embeddings.embed_documents(texts)
+# INDEXING
+def add_file(file_path):
+    documents = load_and_split_document(file_path)
+    data = ""
+    for _doc in documents:
+        data = data + "\n" + _doc.page_content
 
+    batch_size = 100
+    for i in tqdm(range(0, len(data), batch_size)):
+        i_end = min(len(data), i+batch_size)
+        batch = data[i:i_end]
+        metadatas = [
+            {
+                'source': file_path
+            } for _ in batch
+        ]
+        embeds = embeddings.embed_documents(batch)
+        ids = f"id_{i}"
+        index.upsert(vectors=list(zip(ids, embeds, metadatas)), namespace=file_path) # add everything to pinecone
+
+
+# delete all the vectors (from a specific file)
+def delete_file(file):
+    index.delete(deleteAll='true', namespace=file)
+
+
+# reset index => delete -> create_new
+def reset_index():
+    pinecone.delete_index(index_name)
+    metadata_config = {"indexed": ["source"]}
+    pinecone.create_index(index_name, dimension=1536, metadata_config=metadata_config)
 
 
 
