@@ -86,19 +86,12 @@ def dashboard():
     return render_template('dashboard.html', files=files)
 
 
-# uploaded files here
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    # Serve the uploaded file directly from the server
-    return send_from_directory(UPLOAD_FOLDER, filename)
-
-
-# upload
+# UPLOAD FILES from local storage
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload():
     if request.method == 'POST':
-        files = request.files.getlist('file')  # Get a list of uploaded files
+        files = request.files.getlist('file')
         
         if not files:
             flash('No files selected')
@@ -106,8 +99,14 @@ def upload():
 
         for file in files:
             if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(UPLOAD_FOLDER, filename))
+                file_path = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
+                file.save(os.path.join(UPLOAD_FOLDER, file_path))
+
+                status = upload_file_to_pinecone(file_path)
+                if status != "ok":
+                    flash('Upload Limit Reached')
+                    return redirect(url_for('dashboard'))
+
             else:
                 flash('Invalid file type')
                 return redirect(url_for('dashboard'))
@@ -116,21 +115,7 @@ def upload():
         return redirect(url_for('dashboard'))
 
 
-# delete an uploaded file  
-# @app.route('/delete/<filename>', methods=['POST'])
-@app.route('/delete/<filename>')
-@login_required
-def delete(filename):
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    if os.path.exists(filepath):
-        os.remove(filepath)
-        flash('File deleted successfully')
-    else:
-        flash('File not found')
-    return redirect(url_for('dashboard'))
-
-
-# upload files from google drive
+# UPLOAD FILES from google drive
 @app.route('/upload_google_drive', methods=['POST'])
 @login_required
 def upload_google_drive():
@@ -161,7 +146,7 @@ def upload_google_drive():
         return redirect(url_for('dashboard'))
 
 
-# To handle URL submission
+# UPLOAD FILES as txt scraped URL
 @app.route('/handle_url', methods=['POST'])
 @login_required
 def handle_url():
@@ -169,6 +154,27 @@ def handle_url():
         url = request.form.get('url')
         result_message = handle_urls(url)
         flash(result_message)
+    return redirect(url_for('dashboard'))
+
+
+# uploaded files here
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    # Serve the uploaded file directly from the server
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+
+# delete an uploaded file  
+# @app.route('/delete/<filename>', methods=['POST'])
+@app.route('/delete/<filename>')
+@login_required
+def delete(filename):
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(filepath):
+        os.remove(filepath)
+        flash('File deleted successfully')
+    else:
+        flash('File not found')
     return redirect(url_for('dashboard'))
 
 
