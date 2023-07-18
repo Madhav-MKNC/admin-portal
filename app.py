@@ -100,7 +100,14 @@ def upload():
         for file in files:
             if file and allowed_file(file.filename):
                 file_path = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
-                file.save(os.path.join(UPLOAD_FOLDER, file_path))
+                file.save(file_path)
+
+                # # downloading -> reading in binary -> saving with encoding=utf-8
+                # file.save(file_path, buffer_size=16384)  # Buffer size for large files
+                # with open(file_path, 'rb') as file:
+                #     content = file.read()
+                # with open(file_path, 'w', encoding='utf-8') as file:
+                #     file.write(content.decode('utf-8'))
 
                 status = upload_file_to_pinecone(file_path)
                 if status != "ok":
@@ -133,6 +140,13 @@ def upload_google_drive():
             filename = secure_filename(file.filename)
             file_path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(file_path)
+
+            # # downloading -> reading in binary -> saving with encoding=utf-8
+            # file.save(file_path, buffer_size=16384)  # Buffer size for large files
+            # with open(file_path, 'rb') as file:
+            #     content = file.read()
+            # with open(file_path, 'w', encoding='utf-8') as file:
+            #     file.write(content.decode('utf-8'))
 
             file_id = upload_to_google_drive(file_path)
             flash(f'File uploaded to Google Drive with ID: {file_id}')
