@@ -13,7 +13,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-from manage_vectordb import add_file, delete_file
+from manage_vectordb import add_file, delete_file, list_files
 
 
 # directory for data storage
@@ -71,17 +71,6 @@ def handle_urls(url):
     save_path = os.path.join(UPLOAD_FOLDER, file_name)
     
     if response.status_code == 200:
-        # # # for storing all the intext data
-        # # soup = BeautifulSoup(response.text, 'html.parser')
-        # # data_set = set()
-        # # for text in soup.stripped_strings:
-        # #     if not text: continue
-        # #     data_set.add(text)
-        # # with open(save_path, "w", encoding="utf-8") as file:
-        # #     file.write("\n".join(list(data_set)))
-        # with open(save_path, "w", encoding="utf-8") as file:
-        #     file.write(response.text)
-        
         # just storing url of the file for WebBaseLoader
         file_name = str(unique_id()).replace("-","") + ".url"
         save_path = os.path.join(UPLOAD_FOLDER, file_name)
@@ -139,3 +128,7 @@ def delete_file_from_pinecone(file):
     status = "ok"
     delete_file(file)
 
+
+# get list of the source files stored on pinecone
+def list_stored_files():
+    return list_files()

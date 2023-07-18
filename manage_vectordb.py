@@ -65,6 +65,7 @@ def load_and_split_document(file_path):
 # INDEXING
 def add_file(file_path):
     documents = load_and_split_document(file_path)
+    source = file_path.split("/")[-1]
     data = ""
     for _doc in documents:
         data = data + "\n" + _doc.page_content
@@ -75,12 +76,12 @@ def add_file(file_path):
         batch = data[i:i_end]
         metadatas = [
             {
-                'source': file_path
+                'source': source
             } for _ in batch
         ]
         embeds = embeddings.embed_documents(batch)
         ids = f"id_{i}"
-        index.upsert(vectors=list(zip(ids, embeds, metadatas)), namespace=file_path) # add everything to pinecone
+        index.upsert(vectors=list(zip(ids, embeds, metadatas)), namespace=source) # add everything to pinecone
 
 
 # delete all the vectors (from a specific file)
@@ -95,6 +96,10 @@ def reset_index():
     pinecone.create_index(index_name, dimension=1536, metadata_config=metadata_config)
 
 
+def list_files():
+    stats = index.describe_index_stats()
+    sources = stats["namespaces"]
+    return sources
 
-# end
-input()
+
+
