@@ -18,6 +18,8 @@ from googleapiclient.http import MediaFileUpload
 UPLOAD_FOLDER = "./uploads"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+    with open(os.path.join(UPLOAD_FOLDER, "sample_data.txt"), 'w', encoding="utf-8") as file:
+        file.write("This is a sample data\nThe Value of XYZ is 5")
 
 
 # Load admin users from the JSON file

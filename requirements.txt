@@ -1,8 +1,11 @@
-Flask==2.0.2
-python-dotenv==1.0.0
-Werkzeug==2.0.2
+Flask
+python-dotenv
+Werkzeug
 beautifulsoup4
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
 google-auth 
+pinecone-client
+openai
+tiktoken
