@@ -4,15 +4,11 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+from utils import load_and_split_document
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import Pinecone
-from langchain.document_loaders import TextLoader
-from langchain.document_loaders import DirectoryLoader
-from langchain import OpenAI
-from langchain.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQA
+
 import pinecone
+from langchain.vectorstores import Pinecone
 
 
 # Initialize pinecone
@@ -25,98 +21,36 @@ pinecone.init(
 index_name = os.environ["PINECONE_INDEX_NAME"]
 print("[+] Index name:",index_name)
 
-# load documents
-print("[*] Loading data...")
-# loader = TextLoader("./uploads/sample_data.txt")
-loader = DirectoryLoader("./uploads")
-documents = loader.load()
+metadata_config = {
+    "indexed": ["source"]
+}
 
-# splitting
-print("[*] Splitting data into chunks...")
-text_splitter = CharacterTextSplitter(chunk_size=512, chunk_overlap=10)
-documents = text_splitter.split_documents(documents)
+pinecone.create_index(index_name,
+                      dimension=1535,
+                      metadata_config=metadata_config
+)
+
+
+# connecting to the index
+index = pinecone.GRPCIndex(index_name)
+index.describe_index_stats()
+
+# load and split documents
+documents = load_and_split_document("./uploads/sample_data.txt")
+
+# texts
+texts = []
+for _doc in documents:
+    texts.append(_doc.page_content)
 
 # embeddings
 embeddings = OpenAIEmbeddings(
     openai_api_key=os.environ["OPENAI_API_KEY"]
 )
 
-# llm
-# llm = OpenAI(
-#     temperature=0, 
-#     openai_api_key=os.environ["OPENAI_API_KEY"]
-# )
-llm = ChatOpenAI(
-    model='gpt-3.5-turbo'
-)
-
-
-# # qa using dosearch
-
-# docsearch = Pinecone.from_documents(
-#     documents, 
-#     embeddings, 
-#     index_name=index_name
-# )
-# # # if you already have an index
-# # docsearch = Pinecone.from_existing_index(index_name, embeddings)
-
-# # # query answering 
-# def get_response_using_docsearch(query):
-#     docs = docsearch.similarity_search(query)
-#     return docs
-
-
-# qa using RetrievalQA
-
-vectordb = Pinecone.from_documents(
-    documents, 
-    embeddings, 
-    index_name=index_name
-)
-
-retriever = vectordb.as_retriever()
-qa = RetrievalQA.from_chain_type(
-    llm=llm, 
-    chain_type="stuff", 
-    retriever=retriever
-)
-
-def get_response_using_RetrievalQA(query):
-    response = qa.run(query)
-    return response
-    
-
-# add more texts to the vectorstore
-def add_more_texts(new_text):
-    # Adding More Text to an Existing Index
-    index = pinecone.Index(index_name)
-    print("index...")
-    vectorstore = Pinecone(index, embeddings.embed_query, "text")
-    print("vectorstore good...")
-    print(new_text)
-    vectorstore.add_texts("The value of ABC is 7")
-    print("\n\nloaded ABC\n")
-    for more_text in new_text.split("\n"):
-        vectorstore.add_texts(more_text)
-        print("Loaded",more_text)
-    print("\n\nmore text added\n")
+# embedding texts
+res = embeddings.embed_documents(texts)
 
 
 
 
-
-if __name__ == "__main__":
-    while True:
-        query = input("[Human]: ")
-        response = get_response_using_RetrievalQA(query)
-        print("[AI]:", response)
-
-
-
-# """
-# # # Adding More Text to an Existing Index
-# # index = pinecone.Index("langchain-demo")
-# # vectorstore = Pinecone(index, embeddings.embed_query, "text")
-# # vectorstore.add_texts("More text!")
-# """
