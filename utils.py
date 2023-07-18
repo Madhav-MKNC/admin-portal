@@ -2,14 +2,17 @@
 
 import os
 import json
-import requests
 import hashlib
-from bs4 import BeautifulSoup
 from uuid import uuid4 as unique_id
+
+import requests
+from bs4 import BeautifulSoup
+
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+
 
 # directory for data storage
 UPLOAD_FOLDER = "./uploads"
@@ -99,3 +102,13 @@ def upload_to_google_drive(file_path):
 #     # Build Google Drive service
 #     drive_service = build("drive", "v3", credentials=creds)
 #     return drive_service
+
+# upload file to vector database storage (Pinecone)
+def upload_file_to_pinecone(file_path):
+    status = "ok"
+    
+    # process file and upload to pinecone vector database
+    with open(file_path, 'r') as file:
+        print(file.read())
+
+    return status
