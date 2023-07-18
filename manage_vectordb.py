@@ -9,7 +9,6 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 import pinecone
 from langchain.vectorstores import Pinecone
 
-
 from langchain.document_loaders import ( 
     PyMuPDFLoader, 
     TextLoader,
@@ -25,20 +24,21 @@ from tqdm.auto import tqdm
 
 
 # Initialize pinecone
-print("[*] Initializing pinecone...")
+print("[*] Initializing pinecone...\n")
 pinecone.init(
     api_key=os.environ["PINECONE_API_KEY"],
     environment=os.environ["PINECONE_ENV"]
 )
 
 index_name = os.environ["PINECONE_INDEX_NAME"]
-print("[+] Index name:",index_name)
+print("[+] Index name:\n",index_name)
 
 # connecting to the index
 index = pinecone.GRPCIndex(index_name)
 print(index.describe_index_stats())
 embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
 # vectorstore = Pinecone(index, embeddings.embed_query, "text")
+
 
 # load and split documents
 def load_and_split_document(file_path):
@@ -60,6 +60,7 @@ def load_and_split_document(file_path):
     doc = loader.load()
     docs = CharacterTextSplitter(chunk_size=512, chunk_overlap=10).split_documents(doc)
     return docs
+
 
 # INDEXING
 def add_file(file_path):
@@ -84,7 +85,7 @@ def add_file(file_path):
 
 # delete all the vectors (from a specific file)
 def delete_file(file):
-    index.delete(deleteAll='true', namespace=file)
+    index.delete(delete_all=True, namespace=file)
 
 
 # reset index => delete -> create_new
@@ -95,3 +96,5 @@ def reset_index():
 
 
 
+# end
+input()
