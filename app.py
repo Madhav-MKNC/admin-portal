@@ -17,8 +17,8 @@ load_dotenv()
 app = Flask(__name__)
 
 # secret key
-# app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random key in a production environment
-app.secret_key = str(unique_id()).replace("-","")
+app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random key in a production environment
+# app.secret_key = str(unique_id()).replace("-","")
 
 # URL to the chatbot
 CHATBOT_URL = "http://localhost:8081"
@@ -117,6 +117,7 @@ def upload():
 
 
 # delete an uploaded file  
+# @app.route('/delete/<filename>', methods=['POST'])
 @app.route('/delete/<filename>')
 @login_required
 def delete(filename):
