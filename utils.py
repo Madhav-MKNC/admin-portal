@@ -13,16 +13,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-from langchain.document_loaders import ( 
-    PyMuPDFLoader, 
-    TextLoader,
-    Docx2txtLoader, 
-    WebBaseLoader,
-    CSVLoader
-)
-from langchain.document_loaders.csv_loader import CSVLoader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.document_loaders import UnstructuredURLLoader
+from manage_vectordb import add_file, delete_file
 
 
 # directory for data storage
@@ -121,64 +112,30 @@ def upload_to_google_drive(file_path):
     file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
     return file.get('id')
 
-# Function to handle Google Drive authentication
-def authenticate_google_drive():
-    from google.oauth2.credentials import Credentials
+# # Function to handle Google Drive authentication
+# def authenticate_google_drive():
+#     from google.oauth2.credentials import Credentials
 
-    # Load credentials from the session
-    creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
+#     # Load credentials from the session
+#     creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
 
-    # Build Google Drive service
-    drive_service = build("drive", "v3", credentials=creds)
-    return drive_service
+#     # Build Google Drive service
+#     drive_service = build("drive", "v3", credentials=creds)
+#     return drive_service
+
 
 # upload file to vector database storage (Pinecone)
 def upload_file_to_pinecone(file):
     status = "ok"
-    file_extension = file.split('.')[-1].lower()
-
-    if file_extension == "txt":
-        loader = TextLoader(file)
-    elif file_extension == "pdf":
-        loader = PyMuPDFLoader(file)
-    elif file_extension == "doc" or file_extension == "docx":
-        loader = Docx2txtLoader(file)
-    elif file_extension == "csv":
-        loader = CSVLoader(file)
-    elif file_extension == "url":
-        with open(file, 'r') as something:
-            url = something.read()
-        loader = WebBaseLoader(url)
-
-    doc = loader.load()
-    text_splitter = CharacterTextSplitter(chunk_size=512, chunk_overlap=10)
-    docs = text_splitter.split_documents(doc)
-    print(docs)
     
-    # try:
-    #     add_more_texts(docs)
-    # except Exception as e:
-    #     status = e
-    # return status
+    try:
+        add_file(file)
+    except Exception as e:
+        status = e
+    return status
 
+# delete a file from pinecone (delete all the vectors related to)
+def delete_file_from_pinecone(file):
+    status = "ok"
+    delete_file(file)
 
-# load and split documents
-def load_and_split_document(file_path):
-    file_extension = file_path.split('.')[-1].lower()
-
-    if file_extension == "txt":
-        loader = TextLoader(file_path)
-    elif file_extension == "pdf":
-        loader = PyMuPDFLoader(file_path)
-    elif file_extension == "doc" or file_extension == "docx":
-        loader = Docx2txtLoader(file_path)
-    elif file_extension == "csv":
-        loader = CSVLoader(file_path)
-    elif file_extension == "url":
-        with open(file_path, 'r') as something:
-            url = something.read()
-        loader = WebBaseLoader(url)
-
-    doc = loader.load()
-    docs = CharacterTextSplitter(chunk_size=512, chunk_overlap=10).split_documents(doc)
-    return docs

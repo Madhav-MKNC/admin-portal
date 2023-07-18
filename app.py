@@ -189,6 +189,7 @@ def delete(filename):
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     if os.path.exists(filepath):
         os.remove(filepath)
+        delete_file_from_pinecone(filepath)
         flash('File deleted successfully')
     else:
         flash('File not found')

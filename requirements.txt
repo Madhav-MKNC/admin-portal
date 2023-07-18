@@ -12,3 +12,6 @@ openai
 tiktoken
 unstructured
 pymupdf
+pandas
+pathlib
+tqdm 
