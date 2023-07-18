@@ -82,7 +82,7 @@ def dashboard():
     if not session.get('authenticated'):
         return redirect(url_for('login'))
 
-    files = os.listdir(UPLOAD_FOLDER)
+    files = list_stored_files()
     return render_template('dashboard.html', files=files)
 
 
@@ -186,7 +186,7 @@ def uploaded_file(filename):
 @app.route('/delete/<filename>')
 @login_required
 def delete(filename):
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    filepath = filename
     if os.path.exists(filepath):
         os.remove(filepath)
         delete_file_from_pinecone(filepath)
