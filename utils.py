@@ -13,6 +13,17 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+from langchain.document_loaders import ( 
+    PyMuPDFLoader, 
+    TextLoader,
+    Docx2txtLoader, 
+    WebBaseLoader,
+    CSVLoader
+)
+from langchain.document_loaders.csv_loader import CSVLoader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.document_loaders import UnstructuredURLLoader
+
 
 # directory for data storage
 UPLOAD_FOLDER = "./uploads"
@@ -69,16 +80,24 @@ def handle_urls(url):
     save_path = os.path.join(UPLOAD_FOLDER, file_name)
     
     if response.status_code == 200:
-        # # for storing all the intext data
-        # soup = BeautifulSoup(response.text, 'html.parser')
-        # data_set = set()
-        # for text in soup.stripped_strings:
-        #     if not text: continue
-        #     data_set.add(text)
+        # # # for storing all the intext data
+        # # soup = BeautifulSoup(response.text, 'html.parser')
+        # # data_set = set()
+        # # for text in soup.stripped_strings:
+        # #     if not text: continue
+        # #     data_set.add(text)
+        # # with open(save_path, "w", encoding="utf-8") as file:
+        # #     file.write("\n".join(list(data_set)))
         # with open(save_path, "w", encoding="utf-8") as file:
-        #     file.write("\n".join(list(data_set)))
-        with open(save_path, "w", encoding="utf-8") as file:
-            file.write(response.text)
+        #     file.write(response.text)
+        
+        # just storing url of the file for WebBaseLoader
+        file_name = str(unique_id()).replace("-","") + ".url"
+        save_path = os.path.join(UPLOAD_FOLDER, file_name)
+        with open(save_path, 'w', encoding="utf-8") as file:
+            file.write(url)
+        upload_file_to_pinecone(save_path)
+
         return "Data Fetched Successfully"
     else:
         return "Failed to Fetch Data"
@@ -114,12 +133,30 @@ def upload_to_google_drive(file_path):
 #     return drive_service
 
 # upload file to vector database storage (Pinecone)
-def upload_file_to_pinecone(file_path):
+def upload_file_to_pinecone(file):
     status = "ok"
+    file_extension = file.split('.')[-1].lower()
+
+    if file_extension == "txt":
+        loader = TextLoader(file)
+    elif file_extension == "pdf":
+        loader = PyMuPDFLoader(file)
+    elif file_extension == "doc" or file_extension == "docx":
+        loader = Docx2txtLoader(file)
+    elif file_extension == "csv":
+        loader = CSVLoader(file)
+    elif file_extension == "url":
+        with open(file, 'r') as something:
+            url = something.read()
+        loader = WebBaseLoader(url)
+
+    doc = loader.load()
+    text_splitter = CharacterTextSplitter(chunk_size=512, chunk_overlap=10)
+    docs = text_splitter.split_documents(doc)
+    print(docs)
     
-    # # process file and upload to pinecone vector database
-    # # with open(file_path, 'r', encoding='utf-8') as file:
-    # with open(file_path, 'r') as file:
-    #     print(file.read())
-    
-    return status
+    # try:
+    #     add_more_texts(docs)
+    # except Exception as e:
+    #     status = e
+    # return status

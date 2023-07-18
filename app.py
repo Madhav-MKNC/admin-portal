@@ -108,10 +108,13 @@ def upload():
                 #     content = file.read()
                 # with open(file_path, 'w', encoding='utf-8') as file:
                 #     file.write(content.decode('utf-8'))
-
+                print("\n0\n")
                 status = upload_file_to_pinecone(file_path)
+                print(status)
+                print("\n1\n")
                 if status != "ok":
                     flash('Upload Limit Reached')
+                    flash(status)
                     return redirect(url_for('dashboard'))
 
             else:
