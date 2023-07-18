@@ -38,7 +38,10 @@ def allowed_file(filename):
 # for validating the url
 def valid_url(url):
     try:
-        response = requests.head(url)
+        response = requests.head(
+            url = url,
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+        )
         return response.status_code == 200
     except requests.RequestException:
         return False
@@ -48,7 +51,10 @@ def handle_urls(url):
     if not valid_url(url):
         return "Invalid URL"
 
-    response = requests.get(url)
+    response = requests.get(
+        url = url,
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+    )
     file_name = str(unique_id()).replace("-","") + ".txt"
     save_path = os.path.join(UPLOAD_FOLDER, file_name)
     
@@ -58,7 +64,7 @@ def handle_urls(url):
         for text in soup.stripped_strings:
             if not text: continue
             data_set.add(text)
-        with open(save_path, "w") as file:
+        with open(save_path, "w", encoding="utf-8") as file:
             file.write("\n".join(list(data_set)))
         return "Data Fetched Successfully"
     else:

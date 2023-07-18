@@ -51,7 +51,8 @@
                     {% for filename in files %}
                         <li>
                             <a href="{{ url_for('uploaded_file', filename=filename) }}" target="_blank">{{ filename }}</a>
-                            <form method="post" action="{{ url_for('delete', filename=filename) }}" onsubmit="return confirm('Are you sure you want to delete this file?')">
+                            <!-- <form method="post" action="{{ url_for('delete', filename=filename) }}" onsubmit="return confirm('Are you sure you want to delete this file?')"> -->
+                            <form action="{{ url_for('delete', filename=filename) }}" onsubmit="return confirm('Are you sure you want to delete this file?')">
                                 <button type="submit">Delete</button>
                             </form>
                         </li>
