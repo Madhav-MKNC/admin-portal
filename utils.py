@@ -29,8 +29,8 @@ from langchain.document_loaders import UnstructuredURLLoader
 UPLOAD_FOLDER = "./uploads"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-    with open(os.path.join(UPLOAD_FOLDER, "sample_data.txt"), 'w', encoding="utf-8") as file:
-        file.write("This is a sample data\nThe Value of XYZ is 5")
+with open(os.path.join(UPLOAD_FOLDER, "sample_data.txt"), 'w', encoding="utf-8") as file:
+    file.write("This is a sample data\nThe Value of XYZ is 5")
 
 
 # Load admin users from the JSON file
@@ -121,16 +121,16 @@ def upload_to_google_drive(file_path):
     file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
     return file.get('id')
 
-# # Function to handle Google Drive authentication
-# def authenticate_google_drive():
-#     from google.oauth2.credentials import Credentials
+# Function to handle Google Drive authentication
+def authenticate_google_drive():
+    from google.oauth2.credentials import Credentials
 
-#     # Load credentials from the session
-#     creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
+    # Load credentials from the session
+    creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
 
-#     # Build Google Drive service
-#     drive_service = build("drive", "v3", credentials=creds)
-#     return drive_service
+    # Build Google Drive service
+    drive_service = build("drive", "v3", credentials=creds)
+    return drive_service
 
 # upload file to vector database storage (Pinecone)
 def upload_file_to_pinecone(file):
@@ -160,3 +160,25 @@ def upload_file_to_pinecone(file):
     # except Exception as e:
     #     status = e
     # return status
+
+
+# load and split documents
+def load_and_split_document(file_path):
+    file_extension = file_path.split('.')[-1].lower()
+
+    if file_extension == "txt":
+        loader = TextLoader(file_path)
+    elif file_extension == "pdf":
+        loader = PyMuPDFLoader(file_path)
+    elif file_extension == "doc" or file_extension == "docx":
+        loader = Docx2txtLoader(file_path)
+    elif file_extension == "csv":
+        loader = CSVLoader(file_path)
+    elif file_extension == "url":
+        with open(file_path, 'r') as something:
+            url = something.read()
+        loader = WebBaseLoader(url)
+
+    doc = loader.load()
+    docs = CharacterTextSplitter(chunk_size=512, chunk_overlap=10).split_documents(doc)
+    return docs

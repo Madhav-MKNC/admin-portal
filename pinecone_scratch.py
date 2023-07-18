@@ -38,8 +38,25 @@ index.upsert_from_dataframe(
     batch_size=100
 )
 index.upsert(
-    vectors=list(),
-    batch_size=100
+    vectors=[
+        (
+         "vec1",                # Vector ID 
+         [0.1, 0.2, 0.3, 0.4],  # Dense vector values
+         {"genre": "drama"}     # Vector metadata
+        ),
+        (
+         "vec2", 
+         [0.2, 0.3, 0.4, 0.5], 
+         {"genre": "action"}
+        )
+    ],
+    namespace="example-namespace"
+)
+
+# delete from index
+delete_response = index.delete(
+    ids=["vec1", "vec2"],
+    namespace="example-namespace"
 )
 
 # embeddings
