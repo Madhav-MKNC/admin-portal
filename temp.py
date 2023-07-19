@@ -96,6 +96,8 @@ def get_response_using_RetrievalQA(query):
     return response
     
 
+    
+
 # add more texts to the vectorstore
 def add_more_texts(new_text):
     # Adding More Text to an Existing Index
@@ -116,11 +118,4 @@ if __name__ == "__main__":
         print("[AI]:", response)
 
 
-
-# """
-# # # Adding More Text to an Existing Index
-# # index = pinecone.Index("langchain-demo")
-# # vectorstore = Pinecone(index, embeddings.embed_query, "text")
-# # vectorstore.add_texts("More text!")
-# """
 
