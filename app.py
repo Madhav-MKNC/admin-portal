@@ -99,24 +99,16 @@ def upload():
 
         for file in files:
             if file and allowed_file(file.filename):
-                file_path = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
-                file.save(file_path)
+                filename = secure_filename(file.filename)
+                file.save(filename)
 
-                # # downloading -> reading in binary -> saving with encoding=utf-8
-                # file.save(file_path, buffer_size=16384)  # Buffer size for large files
-                # with open(file_path, 'rb') as file:
-                #     content = file.read()
-                # with open(file_path, 'w', encoding='utf-8') as file:
-                #     file.write(content.decode('utf-8'))
-                print("\n0\n")
-                status = upload_file_to_pinecone(file_path)
-                print(status)
-                print("\n1\n")
+                status = upload_file_to_pinecone(filename)
+                if os.path.exists(filename):
+                    os.remove(filename)
                 if status != "ok":
                     flash('Upload Limit Reached')
                     flash(status)
                     return redirect(url_for('dashboard'))
-
             else:
                 flash('Invalid file type')
                 return redirect(url_for('dashboard'))
@@ -125,42 +117,34 @@ def upload():
         return redirect(url_for('dashboard'))
 
 
-# UPLOAD FILES from google drive
-@app.route('/upload_google_drive', methods=['POST'])
-@login_required
-def upload_google_drive():
-    try:
-        if 'file' not in request.files:
-            flash('No file selected')
-            return redirect(url_for('dashboard'))
+# # UPLOAD FILES from google drive
+# @app.route('/upload_google_drive', methods=['POST'])
+# @login_required
+# def upload_google_drive():
+#     try:
+#         if 'file' not in request.files:
+#             flash('No file selected')
+#             return redirect(url_for('dashboard'))
 
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(url_for('dashboard'))
+#         file = request.files['file']
+#         if file.filename == '':
+#             flash('No selected file')
+#             return redirect(url_for('dashboard'))
 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(file_path)
+#         if file and allowed_file(file.filename):
+#             filename = secure_filename(file.filename)
+#             file.save(filename)
 
-            # # downloading -> reading in binary -> saving with encoding=utf-8
-            # file.save(file_path, buffer_size=16384)  # Buffer size for large files
-            # with open(file_path, 'rb') as file:
-            #     content = file.read()
-            # with open(file_path, 'w', encoding='utf-8') as file:
-            #     file.write(content.decode('utf-8'))
+#             file_id = upload_to_google_drive(filename)
+#             flash(f'File uploaded to Google Drive with ID: {file_id}')
+#             return redirect(url_for('dashboard'))
+#         else:
+#             flash('Invalid file type')
+#             return redirect(url_for('dashboard'))
 
-            file_id = upload_to_google_drive(file_path)
-            flash(f'File uploaded to Google Drive with ID: {file_id}')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid file type')
-            return redirect(url_for('dashboard'))
-
-    except Exception as e:
-        flash(f'Error uploading to Google Drive: {str(e)}')
-        return redirect(url_for('dashboard'))
+#     except Exception as e:
+#         flash(f'Error uploading to Google Drive: {str(e)}')
+#         return redirect(url_for('dashboard'))
 
 
 # UPLOAD FILES as txt scraped URL
@@ -174,25 +158,13 @@ def handle_url():
     return redirect(url_for('dashboard'))
 
 
-# uploaded files here
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    # Serve the uploaded file directly from the server
-    return send_from_directory(UPLOAD_FOLDER, filename)
-
-
 # delete an uploaded file  
 # @app.route('/delete/<filename>', methods=['POST'])
-@app.route('/delete/<filename>')
+@app.route('/delete/<path:filename>')
 @login_required
 def delete(filename):
-    filepath = filename
-    if os.path.exists(filepath):
-        os.remove(filepath)
-        delete_file_from_pinecone(filepath)
-        flash('File deleted successfully')
-    else:
-        flash('File not found')
+    delete_file_from_pinecone(filename)
+    flash('File deleted successfully')
     return redirect(url_for('dashboard'))
 
 

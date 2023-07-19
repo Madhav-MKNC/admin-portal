@@ -5,6 +5,7 @@ import json
 import hashlib
 from uuid import uuid4 as unique_id
 
+from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
 
@@ -16,20 +17,14 @@ from googleapiclient.http import MediaFileUpload
 from manage_vectordb import add_file, delete_file, list_files
 
 
-# directory for data storage
-UPLOAD_FOLDER = "./uploads"
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-with open(os.path.join(UPLOAD_FOLDER, "sample_data.txt"), 'w', encoding="utf-8") as file:
-    file.write("This is a sample data\nThe Value of XYZ is 5")
-
-
 # Load admin users from the JSON file
 ADMIN_USERS_FILE = 'admin_users.json'
 ADMIN_USERS = []
 if os.path.exists(ADMIN_USERS_FILE):
     with open(ADMIN_USERS_FILE, 'r') as file:
         ADMIN_USERS = json.load(file)
+else:
+    print(f"[error] {ADMIN_USERS_FILE} NOT FOUND")
 
 
 # Check if the provided username and password match any admin user
@@ -46,6 +41,12 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# check if the parameter is a url
+def is_url(filename):
+    parsed_url = urlparse(filename)
+    return parsed_url.scheme != '' and parsed_url.netloc != ''
+
+
 # for validating the url
 def valid_url(url):
     try:
@@ -57,49 +58,32 @@ def valid_url(url):
     except requests.RequestException:
         return False
 
-
 # Function to handle URLs
 def handle_urls(url):
     if not valid_url(url):
         return "Invalid URL"
 
-    response = requests.get(
-        url = url,
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-    )
-    file_name = str(unique_id()).replace("-","") + ".txt"
-    save_path = os.path.join(UPLOAD_FOLDER, file_name)
-    
-    if response.status_code == 200:
-        # just storing url of the file for WebBaseLoader
-        file_name = str(unique_id()).replace("-","") + ".url"
-        save_path = os.path.join(UPLOAD_FOLDER, file_name)
-        with open(save_path, 'w', encoding="utf-8") as file:
-            file.write(url)
-        upload_file_to_pinecone(save_path)
+    upload_file_to_pinecone(file=url, isurl=True)
+    return "Data Fetched Successfully"
 
-        return "Data Fetched Successfully"
-    else:
-        return "Failed to Fetch Data"
+# # Function to get Google Drive credentials using OAuth 2.0
+# def get_google_drive_credentials():
+#     # The scopes required for accessing Google Drive files
+#     SCOPES = ['https://www.googleapis.com/auth/drive.file']
+#     flow = InstalledAppFlow.from_client_secrets_file('client-secret.json', SCOPES)
+#     credentials = flow.run_local_server(port=0)
+#     return credentials
 
-# Function to get Google Drive credentials using OAuth 2.0
-def get_google_drive_credentials():
-    # The scopes required for accessing Google Drive files
-    SCOPES = ['https://www.googleapis.com/auth/drive.file']
-    flow = InstalledAppFlow.from_client_secrets_file('client-secret.json', SCOPES)
-    credentials = flow.run_local_server(port=0)
-    return credentials
+# # Function to upload file to Google Drive
+# def upload_to_google_drive(file_path):
+#     credentials = get_google_drive_credentials()
+#     service = build('drive', 'v3', credentials=credentials)
 
-# Function to upload file to Google Drive
-def upload_to_google_drive(file_path):
-    credentials = get_google_drive_credentials()
-    service = build('drive', 'v3', credentials=credentials)
+#     file_metadata = {'name': os.path.basename(file_path)}
+#     media = MediaFileUpload(file_path, resumable=True)
 
-    file_metadata = {'name': os.path.basename(file_path)}
-    media = MediaFileUpload(file_path, resumable=True)
-
-    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    return file.get('id')
+#     file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+#     return file.get('id')
 
 # # Function to handle Google Drive authentication
 # def authenticate_google_drive():
@@ -114,21 +98,29 @@ def upload_to_google_drive(file_path):
 
 
 # upload file to vector database storage (Pinecone)
-def upload_file_to_pinecone(file):
+def upload_file_to_pinecone(file, isurl=False):
     status = "ok"
     
     try:
-        add_file(file)
+        add_file(file, isurl=isurl)
     except Exception as e:
         status = e
     return status
 
 # delete a file from pinecone (delete all the vectors related to)
 def delete_file_from_pinecone(file):
-    status = "ok"
     delete_file(file)
 
 
 # get list of the source files stored on pinecone
 def list_stored_files():
     return list_files()
+
+
+
+
+
+
+
+
+
