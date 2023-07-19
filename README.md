@@ -23,16 +23,33 @@ The project consists of the following files:
 
 ## Installation and Setup
 1. Clone the repository from GitHub.
-2. Install the required dependencies using `pip install -r requirements.txt`.
+
+```(bash)
+git clone https://github.com/madhav-mknc/admin-portal
+cd https://github.com/madhav-mknc/admin-portal
+```
+2. Install the required dependencies using:
+```(bash)
+pip install -r requirements.txt
+```
 3. Set the environment variable `FLASK_SECRET_KEY` to a strong random key for session management and security. **Note:** In a production environment, ensure this key is kept secret and not hard-coded.
 4. Ensure the `admin_users.json` file contains valid admin user credentials.
+5. Set all the required env variables mentioned in ".env" file.
 
 ## How to Run
-To start the Flask server, run the `start_server()` function in the `app.py` file. The server will run on `http://0.0.0.0:80/` and listen to incoming requests.
+- To start the Flask server, run the `start_server()` function in the `app.py` file. The server will run on `http://0.0.0.0:80/` and listen to incoming requests.
 
 ```bash
 python app.py
 ```
+
+- For testing QnA: Open another command line in the same directory and follow the following commands:
+```(bash)
+python manage_vectordb.py
+```
+
+    * ".stats" is a command short for index.describe_index_stats()
+    * ".reset_index" is for resetting the index by deleting and creating a new one.
 
 ## Routes
 The Flask application exposes the following routes:
