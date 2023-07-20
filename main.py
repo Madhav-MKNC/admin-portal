@@ -11,6 +11,7 @@ COMMAND = "python app.py"
 # run app.py
 def main():
     from app import start_server
+    print("[GOING ONLINE...]")
     start_server()
 
 # install dependencies
