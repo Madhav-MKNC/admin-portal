@@ -1,3 +1,4 @@
+# author: Madhav (https://github.com/madhav-mknc)
 # managing the Pinecone vector database
 
 import os 
