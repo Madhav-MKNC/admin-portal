@@ -17,6 +17,7 @@ Before running the application, ensure the following prerequisites are met:
 ## Project Structure
 The project consists of the following files:
 
+0. `main.py`: The man program script. Starting point.
 1. `app.py`: The main Flask application file containing the server logic.
 2. `admin_users.json`: A JSON file containing a list of admin users' credentials.
 3. `client_secret.json`: A JSON file containing Google Drive API keys and credentials. (Get it from here [https://console.cloud.google.com/])
@@ -44,6 +45,10 @@ pip install -r requirements.txt
 
 ```bash
 python app.py
+```
+or 
+```bash
+python main.py
 ```
 
 - For testing QnA: Open another command line in the same directory and follow the following commands:
