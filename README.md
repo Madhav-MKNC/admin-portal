@@ -19,7 +19,10 @@ The project consists of the following files:
 
 1. `app.py`: The main Flask application file containing the server logic.
 2. `admin_users.json`: A JSON file containing a list of admin users' credentials.
-3. `uploads/`: A folder to store the uploaded files.
+3. `client_secret.json`: A JSON file containing Google Drive API keys and credentials. (Get it from here [https://console.cloud.google.com/])
+4. `ids_track.json`: A JSON file used for attaining Data transparency, this file is kept in synced with the pinecone vector database. 
+5. `utils.py`: Utilites / helper functions for `app.py`
+6. `manage_vectordb.py`: Module for managing the data on Pinecone vector database. Also a standalone script for testing the database.
 
 ## Installation and Setup
 1. Clone the repository from GitHub.
@@ -59,6 +62,8 @@ The Flask application exposes the following routes:
 3. `/dashboard`: The main dashboard page where administrators can see the uploaded files and manage them.
 4. `/uploads/<filename>`: A route to serve uploaded files directly from the server.
 5. `/upload`: A route to upload files to the server.
+6. `/upload_google_drive`: A route for uploading files from Google Drive.
+7. `/handle_url`: A route for fetching data using a URL.
 6. `/delete/<filename>`: A route to delete uploaded files from the server.
 7. `/logout`: A route to log out and clear the authenticated session.
 8. `/chatbot`: Redirect to chatbot.
