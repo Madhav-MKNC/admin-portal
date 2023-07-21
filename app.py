@@ -25,6 +25,10 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random
 CHATBOT_URL = "http://localhost:8081"
 print(f"\n[+] Chatbot URL is: {CHATBOT_URL}\n")
 
+# this server address
+HOST = "0.0.0.0"
+PORT = 80
+
 
 # only logged in access
 def login_required(f):
@@ -189,7 +193,7 @@ def logout():
 
 # run server
 def start_server():
-    app.run(host="0.0.0.0", port=80, debug=True)
+    app.run(host=HOST, port=PORT, debug=True)
 
 
 if __name__ == '__main__':
