@@ -25,7 +25,8 @@ h3 {
     margin-bottom: 20px;
 }
 
-.login-link, .chatbot-link {
+.login-link,
+.chatbot-link {
     display: inline-block;
     margin-top: 20px;
     padding: 12px 24px;

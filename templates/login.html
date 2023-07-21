@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Admin Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='login_style.css') }}">
 </head>
+
 <body>
     <div class="container">
         <h1>Admin Login</h1>
         {% if error %}
-            <p class="error">{{ error }}</p>
+        <p class="error">{{ error }}</p>
         {% endif %}
         <form method="post" action="/login">
             <label for="username">Username:</label>
@@ -23,4 +25,5 @@
         // You can add JavaScript here if needed
     </script>
 </body>
+
 </html>

@@ -24,18 +24,21 @@ h1 {
     margin-bottom: 30px;
 }
 
-label, input {
+label,
+input {
     display: block;
     width: 100%;
     margin-bottom: 20px;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"],
+input[type="password"] {
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
     width: 100%;
-    box-sizing: border-box; /* Ensure padding is included in the width */
+    box-sizing: border-box;
+    /* Ensure padding is included in the width */
 }
 
 input[type="submit"] {
