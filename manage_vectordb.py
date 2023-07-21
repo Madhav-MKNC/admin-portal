@@ -173,7 +173,7 @@ def list_files():
 ############## Question Answering ##############
 
 # using OpenAI llm
-llm = OpenAI(temperature=0.3)
+llm = OpenAI(temperature=0.3, presence_penalty=0.6)
 
 # custom prompt
 GENIEPROMPT = """
