@@ -19,8 +19,8 @@ from langchain.document_loaders import (
     PyMuPDFLoader, 
     TextLoader,
     Docx2txtLoader, 
-    WebBaseLoader,
-    CSVLoader
+    CSVLoader,
+    WebBaseLoader
 )
 from langchain.text_splitter import CharacterTextSplitter
 
@@ -37,21 +37,24 @@ def mknc(text=''):
 
 TOTAL_IDS = ".stored_files.json"
 
-def all_files():
+def read_all_files():
     with open(TOTAL_IDS, "r") as json_file:
         files = json.load(json_file)
         return list(files)
 
-def update_all_files_list(add_file="", remove_file=""):
-    files = all_files()
+def write_all_files(files):
+    with open(TOTAL_IDS, "w") as json_file:
+        json.dump(files, json_file)
+
+def update_read_all_files_list(add_file="", remove_file=""):
+    files = read_all_files()
     
     if add_file:
         files.append(add_file)
     if remove_file:
         files.remove(remove_file)
         
-    with open(TOTAL_IDS, "w") as json_file:
-        json.dump(files, json_file)
+    write_all_files(files)
 #####################################################
 
 
@@ -105,7 +108,7 @@ def load_and_split_document(file_path, isurl=False):
 # INDEXING
 def add_file(file_name, isurl=False):
     # checking if this file already exists
-    files = all_files()
+    files = read_all_files()
     if file_name in files:
         status = f"{file_name} already exists"
         return status
@@ -118,9 +121,6 @@ def add_file(file_name, isurl=False):
         texts.append(doc.page_content)
         metadatas.append({'source': file_name})
         ids.append(file_name+str(i))
-    
-    # save total no. of vectors for this file
-    update_all_files_list(add_file=file_name)
 
     res = Pinecone.from_texts(
         index_name=index_name,
@@ -131,6 +131,9 @@ def add_file(file_name, isurl=False):
         metadatas=metadatas,
         ids=ids
     )
+
+    # save total no. of vectors for this file
+    update_read_all_files_list(add_file=file_name)
 
     status = "ok"
     return status
@@ -149,7 +152,7 @@ def delete_file(file):
     )
 
     # update files list (which is maintained locally)
-    update_all_files_list(remove_file=file)
+    update_read_all_files_list(remove_file=file)
 
 # deletes the namespace
 def reset_index():
@@ -162,7 +165,7 @@ def reset_index():
 def list_files():
     # stats = index.describe_index_stats()
     # sources = stats["namespaces"]
-    sources = all_files()
+    sources = read_all_files()
     return sources
 
 
@@ -175,8 +178,9 @@ llm = OpenAI(temperature=0.3)
 # custom prompt
 GENIEPROMPT = """
 You are an Ecommerce expert/mentor. Your users are beginners in this field.
-You provide accurate and descriptive answers to user questions, after researching through the input documents.
+You provide accurate and descriptive answers to user questions, after and only researching through the input documents and the context provided to you.
 Just output 'No relevant data found' if the query is irrelevant to the context provided even if the query is very common.
+Do not forget if the query if not relevant with the context and input documents you have then just output 'No relevant data found', this is very important.
 Provide additional descriptions of any complex terms being used in the response \n\nUser: {question}\n\nAi: 
 """
 
@@ -234,6 +238,7 @@ def cli_run():
                 print("\033[93m[SYSTEM]",index.describe_index_stats())
             elif query == ".reset_index":
                 reset_index()
+                write_all_files(files=[])
                 print("\033[93m[SYSTEM] deleting index...")
             elif query == ".exit":
                 print("\033[93m[SYSTEM] exitting...")
