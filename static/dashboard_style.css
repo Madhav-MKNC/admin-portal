@@ -40,7 +40,8 @@ a:hover {
     margin-bottom: 20px;
 } */
 
-.upload-section h2, .file-list h2 {
+.upload-section h2,
+.file-list h2 {
     border-bottom: 2px solid #007BFF;
     padding-bottom: 5px;
     margin-bottom: 15px;
@@ -132,7 +133,8 @@ a:hover {
     border-radius: 10px;
 }
 
-.upload-section form, .file-list form {
+.upload-section form,
+.file-list form {
     margin-bottom: 20px;
 }
 
@@ -265,4 +267,3 @@ footer p {
 .footer-menu a:hover {
     color: black;
 }
-

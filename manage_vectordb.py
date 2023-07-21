@@ -1,6 +1,7 @@
 # author: Madhav (https://github.com/madhav-mknc)
 # managing the Pinecone vector database
 
+import json
 import os 
 from dotenv import load_dotenv
 load_dotenv()
@@ -23,12 +24,6 @@ from langchain.document_loaders import (
 )
 from langchain.text_splitter import CharacterTextSplitter
 
-import pandas as pd
-from pathlib import Path
-from tqdm.auto import tqdm
-import uuid
-import json
-
 
 #####################################################
 # HELPER FUNCTIONS
@@ -37,7 +32,7 @@ import json
 x_x_x = 0 
 def mknc(text=''):
     global x_x_x
-    print(x_x_x,text)
+    print("\033[31m", x_x_x, "\033[96m", text, "\u001b[37m")
     x_x_x += 1
 
 TOTAL_IDS = "ids_track.json"
@@ -98,7 +93,7 @@ def load_and_split_document(file_path, isurl=False):
         print("filetype not in [pdf, txt, doc, docx, csv]")
     
     doc = loader.load()
-    docs = CharacterTextSplitter(chunk_size=512, chunk_overlap=10).split_documents(doc)
+    docs = CharacterTextSplitter(chunk_size=512, chunk_overlap=1).split_documents(doc)
     return docs
 
 
@@ -171,6 +166,16 @@ def get_response(query):
         query=query,
         namespace=NAMESPACE
     )
+
+    for i in docs:
+        mknc()
+        for j in i:
+            mknc(j)
+        mknc()
+
+    if not docs:
+        return "No relevant data found."
+    
     response = chain(
         {
             "input_documents": docs,
@@ -182,19 +187,28 @@ def get_response(query):
 
 
 
-
+# command line interface for bot
 def cli_run():
-    while True:
-        query = input("[HUMAN:] ").strip()
-        if query == ".stats":
-            print(index.describe_index_stats())
-        elif query == ".reset_index":
-            reset_index()
-        elif query:
-            response = get_response(query)
-            print("[AI:]",response)
-        else:
-            pass
+    try:
+        while True:
+            query = input("\033[0;39m\n[HUMAN] ").strip()
+            if query == ".stats":
+                print("\033[93m[SYSTEM]",index.describe_index_stats())
+            elif query == ".reset_index":
+                reset_index()
+                print("\033[93m[SYSTEM] deleting index...")
+            elif query == ".exit":
+                reset_index()
+                print("\033[93m[SYSTEM] exitting...")
+                return
+            elif query:
+                response = get_response(query)
+                print("\033[0;32m[AI]",response)
+            else:
+                pass
+    except KeyboardInterrupt:
+        print("\033[31mStopped")
+    print("\u001b[37m")
 
 if __name__ == "__main__":
     cli_run()
