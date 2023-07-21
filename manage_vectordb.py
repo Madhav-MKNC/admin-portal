@@ -71,6 +71,8 @@ print("[+] Namespace:",NAMESPACE)
 # connecting to the index
 index = pinecone.GRPCIndex(index_name)
 print(index.describe_index_stats())
+
+# embeddings
 embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
 
 
@@ -93,6 +95,7 @@ def load_and_split_document(file_path, isurl=False):
     else:
         print("\n[error]\n")
         print("filetype not in [pdf, txt, doc, docx, csv]")
+        mknc('what the fuck is happening')
     
     doc = loader.load()
     docs = CharacterTextSplitter(chunk_size=512, chunk_overlap=1).split_documents(doc)
@@ -104,7 +107,7 @@ def add_file(file_name, isurl=False):
     # checking if this file already exists
     files = all_files()
     if file_name in files:
-        status = "File with this filename already exists"
+        status = f"{file_name} already exists"
         return status
 
     docs = load_and_split_document(file_name, isurl=isurl)
@@ -129,7 +132,7 @@ def add_file(file_name, isurl=False):
         ids=ids
     )
 
-    status = "File added to the database"
+    status = "ok"
     return status
     
 
@@ -170,7 +173,13 @@ def list_files():
 llm = OpenAI(temperature=0.3)
 
 # custom prompt
-GENIEPROMPT = "You are an Ecommerce expert/mentor. Your users are beginners in this field. You provide accurate and descriptive answers to user questions, after researching through the vector DB. Provide additional descriptions of any complex terms being used in the response \n\nUser: {question}\n\nAi: "
+GENIEPROMPT = """
+You are an Ecommerce expert/mentor. Your users are beginners in this field.
+You provide accurate and descriptive answers to user questions, after researching through the input documents.
+Just output 'No relevant data found' if the query is irrelevant to the context provided even if the query is very common.
+Provide additional descriptions of any complex terms being used in the response \n\nUser: {question}\n\nAi: 
+"""
+
 prompt_template = PromptTemplate.from_template(GENIEPROMPT)
 
 # chain
@@ -179,6 +188,7 @@ chain = load_qa_chain(
     chain_type="stuff",
     verbose=False
 )
+
 
 # for searching relevant docs
 docsearch = Pinecone.from_existing_index(
@@ -193,11 +203,12 @@ def get_response(query):
         namespace=NAMESPACE
     )
 
-    for i in docs:
-        mknc()
-        for j in i:
-            mknc(j)
-        mknc()
+    # # debugging
+    # for i in docs:
+    #     mknc()
+    #     for j in i:
+    #         mknc(j)
+    #     mknc()
 
     if not docs:
         return "No relevant data found."
@@ -209,6 +220,7 @@ def get_response(query):
         },
         return_only_outputs=True
     )
+
     return response["output_text"]
 
 
@@ -224,7 +236,6 @@ def cli_run():
                 reset_index()
                 print("\033[93m[SYSTEM] deleting index...")
             elif query == ".exit":
-                reset_index()
                 print("\033[93m[SYSTEM] exitting...")
                 return
             elif query:
