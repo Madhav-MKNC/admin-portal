@@ -35,21 +35,23 @@ def mknc(text=''):
     print("\033[31m", x_x_x, "\033[96m", text, "\u001b[37m")
     x_x_x += 1
 
-TOTAL_IDS = "ids_track.json"
+TOTAL_IDS = ".stored_files.json"
 
-def all_vectors():
+def all_files():
     with open(TOTAL_IDS, "r") as json_file:
-        return json.load(json_file)
+        files = json.load(json_file)
+        return list(files)
 
-def update_all_vectors(updated_ids):
-    with open(TOTAL_IDS, "w") as json_file:
-        json.dump(updated_ids, json_file)
+def update_all_files_list(add_file="", remove_file=""):
+    files = all_files()
     
-def save_total_vectors_for_file(file, total):
-    total_vectors = all_vectors()
-    total_vectors[file] = total 
+    if add_file:
+        files.append(add_file)
+    if remove_file:
+        files.remove(remove_file)
+        
     with open(TOTAL_IDS, "w") as json_file:
-        json.dump(total_vectors, json_file)
+        json.dump(files, json_file)
 #####################################################
 
 
@@ -99,6 +101,12 @@ def load_and_split_document(file_path, isurl=False):
 
 # INDEXING
 def add_file(file_name, isurl=False):
+    # checking if this file already exists
+    files = all_files()
+    if file_name in files:
+        status = "File with this filename already exists"
+        return status
+
     docs = load_and_split_document(file_name, isurl=isurl)
     texts = []
     metadatas = []
@@ -109,7 +117,7 @@ def add_file(file_name, isurl=False):
         ids.append(file_name+str(i))
     
     # save total no. of vectors for this file
-    save_total_vectors_for_file(file=file_name, total=ids)
+    update_all_files_list(add_file=file_name)
 
     res = Pinecone.from_texts(
         index_name=index_name,
@@ -121,44 +129,62 @@ def add_file(file_name, isurl=False):
         ids=ids
     )
 
-# delete all the vectors (from a specific file)
-def delete_file(file):
-    # index.delete(namespace=file) # deletion with namespace
-    # index.delete(filter={"source": {"$eq": file}}) # deletion with metadata
-    try:
-        ids = all_vectors()[file]
-        index.delete(ids=ids, namespace=NAMESPACE)
-        updated = all_vectors()
-        updated.pop(file)
-        update_all_vectors(updated)
-    except Exception as e:
-        mknc(e)
+    status = "File added to the database"
+    return status
     
 
-# reset index => delete -> create_new
-def reset_index():
-    pinecone.delete_index(index_name)
-    metadata_config = {"indexed": ["source"]}
-    pinecone.create_index(index_name, dimension=1536, metadata_config=metadata_config)
+# delete all the vectors from a specific file specified by metadata
+def delete_file(file):
+    index.delete(
+        filter={
+            "source": {
+                "$eq": file
+            }
+        },
+        namespace=NAMESPACE,
+        delete_all=False
+    )
 
+    # update files list (which is maintained locally)
+    update_all_files_list(remove_file=file)
+
+# deletes the namespace
+def reset_index():
+    index.delete(
+        namespace=NAMESPACE,
+        delete_all=True
+    )
 
 # list source files
 def list_files():
     # stats = index.describe_index_stats()
     # sources = stats["namespaces"]
-    sources = all_vectors().keys()
+    sources = all_files()
     return sources
 
 
 
 ############## Question Answering ##############
+
+# using OpenAI llm
 llm = OpenAI(temperature=0.3)
 
+# custom prompt
 GENIEPROMPT = "You are an Ecommerce expert/mentor. Your users are beginners in this field. You provide accurate and descriptive answers to user questions, after researching through the vector DB. Provide additional descriptions of any complex terms being used in the response \n\nUser: {question}\n\nAi: "
 prompt_template = PromptTemplate.from_template(GENIEPROMPT)
 
-chain = load_qa_chain(llm, chain_type="stuff", verbose=False)
-docsearch = Pinecone.from_existing_index(index_name, embeddings)
+# chain
+chain = load_qa_chain(
+    llm=llm,
+    chain_type="stuff",
+    verbose=False
+)
+
+# for searching relevant docs
+docsearch = Pinecone.from_existing_index(
+    index_name,
+    embeddings
+)
 
 # query index
 def get_response(query):

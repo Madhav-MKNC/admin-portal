@@ -21,7 +21,7 @@ The project consists of the following files:
 1. `app.py`: The main Flask application file containing the server logic.
 2. `admin_users.json`: A JSON file containing a list of admin users' credentials.
 3. `client_secret.json`: A JSON file containing Google Drive API keys and credentials. (Get it from here [https://console.cloud.google.com/])
-4. `ids_track.json`: A JSON file used for attaining Data transparency, this file is kept in synced with the pinecone vector database. 
+4. `.stored_files.json`: A JSON file used for attaining Data transparency, this file is kept in synced with the pinecone vector database. (maintained by the `manage_vectordb.py`)
 5. `utils.py`: Utilites / helper functions for `app.py`
 6. `manage_vectordb.py`: Module for managing the data on Pinecone vector database. Also a standalone script for testing the database.
 
