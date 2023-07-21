@@ -4,11 +4,9 @@
 import os
 import json
 import hashlib
-from uuid import uuid4 as unique_id
 
 from urllib.parse import urlparse
 import requests
-from bs4 import BeautifulSoup
 
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -101,11 +99,12 @@ def handle_urls(url):
 # upload file to vector database storage (Pinecone)
 def upload_file_to_pinecone(file, isurl=False):
     status = "ok"
-    
+
     try:
-        add_file(file, isurl=isurl)
+        status = add_file(file, isurl=isurl)
     except Exception as e:
         status = e
+
     return status
 
 # delete a file from pinecone (delete all the vectors related to)
