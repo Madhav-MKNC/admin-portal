@@ -2,6 +2,7 @@
 # utilties / helper functions for app.py
 
 import os
+import sys
 import json
 import hashlib
 
@@ -24,6 +25,7 @@ if os.path.exists(ADMIN_USERS_FILE):
         ADMIN_USERS = json.load(file)
 else:
     print(f"[error] {ADMIN_USERS_FILE} NOT FOUND")
+    sys.exit()
 
 
 # Check if the provided username and password match any admin user
