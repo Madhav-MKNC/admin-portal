@@ -7,10 +7,11 @@ body {
 .container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 40px;
     border: 1px solid #ccc;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 h1 {
@@ -126,12 +127,6 @@ a:hover {
 
 
 /* Additional styles for a more professional look */
-
-.container {
-    background-color: #f9f9f9;
-    padding: 30px;
-    border-radius: 10px;
-}
 
 .upload-section form,
 .file-list form {
