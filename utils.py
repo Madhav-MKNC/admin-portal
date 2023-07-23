@@ -68,17 +68,21 @@ def handle_urls(url):
 
 # # GOOGLE DRIVE OPERATIONS 
 
-# Function to get Google Drive credentials using OAuth 2.0
-def get_google_drive_credentials():
-    # The scopes required for accessing Google Drive files
-    SCOPES = ['https://www.googleapis.com/auth/drive.file']
-    flow = InstalledAppFlow.from_client_secrets_file('client-secret.json', SCOPES)
-    credentials = flow.run_local_server(port=0)
-    return credentials
+# The scopes required for accessing Google Drive files
+REDIRECT_URIS = [
+    "http://localhost:80/oauth2callback",
+    "http://localhost/oauth2callback"
+]
+JAVASCRIPT_ORIGINS = [
+    "http://localhost:80",
+    "http://localhost"
+]
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
+flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+credentials = flow.run_local_server(port=0)
 
 # Function to upload file to Google Drive
 def upload_to_google_drive(file_path):
-    credentials = get_google_drive_credentials()
     service = build('drive', 'v3', credentials=credentials)
 
     file_metadata = {'name': os.path.basename(file_path)}
@@ -88,13 +92,8 @@ def upload_to_google_drive(file_path):
     return file.get('id')
 
 # Function to handle Google Drive authentication
-def authenticate_google_drive():
-    from google.oauth2.credentials import Credentials
-
-    # Load credentials from the session
+def authenticate_google_drive(session):
     creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
-
-    # Build Google Drive service
     drive_service = build("drive", "v3", credentials=creds)
     return drive_service
 
