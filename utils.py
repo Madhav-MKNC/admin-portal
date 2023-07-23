@@ -35,18 +35,15 @@ def is_authenticated(username, password):
             return True
     return False
 
-
 # Check if the uploaded file has an allowed extension (customize this list as needed)
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'txt', 'pdf', 'doc', 'docx', 'csv'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 # check if the parameter is a url
 def is_url(filename):
     parsed_url = urlparse(filename)
     return parsed_url.scheme != '' and parsed_url.netloc != ''
-
 
 # for validating the url
 def valid_url(url):
@@ -67,36 +64,43 @@ def handle_urls(url):
     upload_file_to_pinecone(file=url, isurl=True)
     return "Data Fetched Successfully"
 
-# # Function to get Google Drive credentials using OAuth 2.0
-# def get_google_drive_credentials():
-#     # The scopes required for accessing Google Drive files
-#     SCOPES = ['https://www.googleapis.com/auth/drive.file']
-#     flow = InstalledAppFlow.from_client_secrets_file('client-secret.json', SCOPES)
-#     credentials = flow.run_local_server(port=0)
-#     return credentials
 
-# # Function to upload file to Google Drive
-# def upload_to_google_drive(file_path):
-#     credentials = get_google_drive_credentials()
-#     service = build('drive', 'v3', credentials=credentials)
 
-#     file_metadata = {'name': os.path.basename(file_path)}
-#     media = MediaFileUpload(file_path, resumable=True)
+# # GOOGLE DRIVE OPERATIONS 
 
-#     file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-#     return file.get('id')
+# Function to get Google Drive credentials using OAuth 2.0
+def get_google_drive_credentials():
+    # The scopes required for accessing Google Drive files
+    SCOPES = ['https://www.googleapis.com/auth/drive.file']
+    flow = InstalledAppFlow.from_client_secrets_file('client-secret.json', SCOPES)
+    credentials = flow.run_local_server(port=0)
+    return credentials
 
-# # Function to handle Google Drive authentication
-# def authenticate_google_drive():
-#     from google.oauth2.credentials import Credentials
+# Function to upload file to Google Drive
+def upload_to_google_drive(file_path):
+    credentials = get_google_drive_credentials()
+    service = build('drive', 'v3', credentials=credentials)
 
-#     # Load credentials from the session
-#     creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
+    file_metadata = {'name': os.path.basename(file_path)}
+    media = MediaFileUpload(file_path, resumable=True)
 
-#     # Build Google Drive service
-#     drive_service = build("drive", "v3", credentials=creds)
-#     return drive_service
+    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    return file.get('id')
 
+# Function to handle Google Drive authentication
+def authenticate_google_drive():
+    from google.oauth2.credentials import Credentials
+
+    # Load credentials from the session
+    creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
+
+    # Build Google Drive service
+    drive_service = build("drive", "v3", credentials=creds)
+    return drive_service
+
+
+
+# # PINECONE OPERATIONS
 
 # upload file to vector database storage (Pinecone)
 def upload_file_to_pinecone(file, isurl=False):
