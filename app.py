@@ -122,34 +122,34 @@ def upload():
         return redirect(url_for('dashboard'))
 
 
-# # UPLOAD FILES from google drive
-# @app.route('/upload_google_drive', methods=['POST'])
-# @login_required
-# def upload_google_drive():
-#     try:
-#         if 'file' not in request.files:
-#             flash('No file selected')
-#             return redirect(url_for('dashboard'))
+# UPLOAD FILES from google drive
+@app.route('/upload_google_drive', methods=['POST'])
+@login_required
+def upload_google_drive():
+    try:
+        if 'file' not in request.files:
+            flash('No file selected')
+            return redirect(url_for('dashboard'))
 
-#         file = request.files['file']
-#         if file.filename == '':
-#             flash('No selected file')
-#             return redirect(url_for('dashboard'))
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(url_for('dashboard'))
 
-#         if file and allowed_file(file.filename):
-#             filename = secure_filename(file.filename)
-#             file.save(filename)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(filename)
 
-#             file_id = upload_to_google_drive(filename)
-#             flash(f'File uploaded to Google Drive with ID: {file_id}')
-#             return redirect(url_for('dashboard'))
-#         else:
-#             flash('Invalid file type')
-#             return redirect(url_for('dashboard'))
+            file_id = upload_to_google_drive(filename)
+            flash(f'File uploaded to Google Drive with ID: {file_id}')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid file type')
+            return redirect(url_for('dashboard'))
 
-#     except Exception as e:
-#         flash(f'Error uploading to Google Drive: {str(e)}')
-#         return redirect(url_for('dashboard'))
+    except Exception as e:
+        flash(f'Error uploading to Google Drive: {str(e)}')
+        return redirect(url_for('dashboard'))
 
 
 # UPLOAD FILES as txt scraped URL
