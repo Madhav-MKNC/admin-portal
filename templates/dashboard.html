@@ -25,7 +25,7 @@
 
             <!-- New "Upload from Google Drive" button -->
             <h2>Upload from Google Drive</h2>
-            <form method="post" action="/upload_google_drive">
+            <form method="post" action="/upload_google_drive" enctype="multipart/form-data">
                 <button type="submit">Upload from Google Drive</button>
             </form>
 
@@ -76,6 +76,8 @@
             </ul>
         </div>
     </footer>
+
+    <script src="{{ url_for('static', filename='upload.js') }}"></script>
 </body>
 
 </html>

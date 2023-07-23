@@ -27,7 +27,7 @@ print(f"\n[+] Chatbot URL is: {CHATBOT_URL}\n")
 
 # this server address
 HOST = "0.0.0.0"
-PORT = 80
+PORT = 50017
 
 
 # only logged in access
@@ -122,6 +122,21 @@ def upload():
         return redirect(url_for('dashboard'))
 
 
+# GOOGLE DRIVE route for OAuth 2.0 authorization
+@app.route('/login_google_drive')
+def login_google_drive():
+    auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline', redirect_uri=REDIRECT_URIS[0])
+    return redirect(auth_url)
+
+
+# GOOGLE DRIVE Callback route for handling OAuth 2.0 response
+@app.route('/oauth2callback')
+def oauth2callback():
+    flow.fetch_token(authorization_response=request.url)
+    session['credentials'] = flow.credentials.to_json()
+    return redirect(url_for('dashboard'))
+
+
 # UPLOAD FILES from google drive
 @app.route('/upload_google_drive', methods=['POST'])
 @login_required
@@ -140,7 +155,8 @@ def upload_google_drive():
             filename = secure_filename(file.filename)
             file.save(filename)
 
-            file_id = upload_to_google_drive(filename)
+            drive_service = authenticate_google_drive(session)
+            file_id = upload_to_google_drive(drive_service, filename)
             flash(f'File uploaded to Google Drive with ID: {file_id}')
             return redirect(url_for('dashboard'))
         else:
@@ -150,6 +166,7 @@ def upload_google_drive():
     except Exception as e:
         flash(f'Error uploading to Google Drive: {str(e)}')
         return redirect(url_for('dashboard'))
+
 
 
 # UPLOAD FILES as txt scraped URL
