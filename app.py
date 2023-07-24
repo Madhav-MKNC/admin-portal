@@ -3,10 +3,11 @@
 # author: Madhav (https://github.com/madhav-mknc)
 
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.utils import secure_filename
 
 from utils import *
+import chatbot
 from functools import wraps
 
 import os
@@ -23,7 +24,7 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random
 
 # this server address
 HOST = "0.0.0.0"
-PORT = 50017
+PORT = 80
 
 
 # only logged in access
@@ -45,6 +46,7 @@ def login_required(f):
 /upload     => for uploading files
 /delete     => for deleting a uploaded file
 /chatbot    => redirect to chatbot
+/get_chat_response => for fetching response from the chatbot
 /logout     => admin logout
 """
 
@@ -118,50 +120,50 @@ def upload():
         return redirect(url_for('dashboard'))
 
 
-# GOOGLE DRIVE route for OAuth 2.0 authorization
-@app.route('/login_google_drive')
-def login_google_drive():
-    auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline', redirect_uri=REDIRECT_URIS[0])
-    return redirect(auth_url)
+# # GOOGLE DRIVE route for OAuth 2.0 authorization
+# @app.route('/login_google_drive')
+# def login_google_drive():
+#     auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline', redirect_uri=REDIRECT_URIS[0])
+#     return redirect(auth_url)
 
 
-# GOOGLE DRIVE Callback route for handling OAuth 2.0 response
-@app.route('/oauth2callback')
-def oauth2callback():
-    flow.fetch_token(authorization_response=request.url)
-    session['credentials'] = flow.credentials.to_json()
-    return redirect(url_for('dashboard'))
+# # GOOGLE DRIVE Callback route for handling OAuth 2.0 response
+# @app.route('/oauth2callback')
+# def oauth2callback():
+#     flow.fetch_token(authorization_response=request.url)
+#     session['credentials'] = flow.credentials.to_json()
+#     return redirect(url_for('dashboard'))
 
 
-# UPLOAD FILES from google drive
-@app.route('/upload_google_drive', methods=['POST'])
-@login_required
-def upload_google_drive():
-    try:
-        if 'file' not in request.files:
-            flash('No file selected')
-            return redirect(url_for('dashboard'))
+# # UPLOAD FILES from google drive
+# @app.route('/upload_google_drive', methods=['POST'])
+# @login_required
+# def upload_google_drive():
+#     try:
+#         if 'file' not in request.files:
+#             flash('No file selected')
+#             return redirect(url_for('dashboard'))
 
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(url_for('dashboard'))
+#         file = request.files['file']
+#         if file.filename == '':
+#             flash('No selected file')
+#             return redirect(url_for('dashboard'))
 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(filename)
+#         if file and allowed_file(file.filename):
+#             filename = secure_filename(file.filename)
+#             file.save(filename)
 
-            drive_service = authenticate_google_drive(session)
-            file_id = upload_to_google_drive(drive_service, filename)
-            flash(f'File uploaded to Google Drive with ID: {file_id}')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid file type')
-            return redirect(url_for('dashboard'))
+#             drive_service = authenticate_google_drive(session)
+#             file_id = upload_to_google_drive(drive_service, filename)
+#             flash(f'File uploaded to Google Drive with ID: {file_id}')
+#             return redirect(url_for('dashboard'))
+#         else:
+#             flash('Invalid file type')
+#             return redirect(url_for('dashboard'))
 
-    except Exception as e:
-        flash(f'Error uploading to Google Drive: {str(e)}')
-        return redirect(url_for('dashboard'))
+#     except Exception as e:
+#         flash(f'Error uploading to Google Drive: {str(e)}')
+#         return redirect(url_for('dashboard'))
 
 
 
@@ -186,6 +188,13 @@ def delete(filename):
     return redirect(url_for('dashboard'))
 
 
+# get response from chatbot
+@app.route('/get_chat_response', methods=['POST'])
+def get_chat_response():
+    user_input = request.json['message']
+    response = chatbot.get_response(query=user_input)
+    return jsonify({'message': response})
+
 # chatbot
 @app.route('/chatbot')
 def chat():
@@ -197,7 +206,7 @@ def chat():
 def logout():
     # Clear the authenticated status from the session
     session.pop('authenticated', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 
 # run server
