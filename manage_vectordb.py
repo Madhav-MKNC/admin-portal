@@ -7,10 +7,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain import OpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains.question_answering import load_qa_chain
-from langchain.chains import RetrievalQA
 
 import pinecone
 from langchain.vectorstores import Pinecone
@@ -96,9 +92,7 @@ def load_and_split_document(file_path, isurl=False):
     elif file_extension == "csv":
         loader = CSVLoader(file_path)
     else:
-        print("\n[error]\n")
-        print("filetype not in [pdf, txt, doc, docx, csv]")
-        mknc('what the fuck is happening')
+        raise TypeError("filetype not in [pdf, txt, doc, docx, csv]")
     
     doc = loader.load()
     docs = CharacterTextSplitter(chunk_size=512, chunk_overlap=1).split_documents(doc)
