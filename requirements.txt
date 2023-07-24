@@ -1,4 +1,6 @@
 Flask
+Requests
+Langchain
 Werkzeug
 beautifulsoup4
 google-api-python-client
@@ -12,6 +14,7 @@ tiktoken
 unstructured
 selenium
 pymupdf
+protobuf
 pandas
 pathlib
 docx2txt
