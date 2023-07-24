@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT-like Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat_style.css') }}">
+</head>
+
+<body>
+    <div class="header">
+        <h1 class="title">Web Chat Bot</h1>
+        <div class="header-container">
+            <a class="header-link" href="/">Home</a>
+            <a class="header-link" href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-box" id="chatBox">
+            <!-- Chat messages will be added dynamically here -->
+        </div>
+        <div class="user-input">
+            <input type="text" id="userInput" placeholder="Type your message..." , onkeyup="handleKeyPress(event)"
+                autofocus>
+            <button id="sendButton" onclick="handleKeyPress()">Send</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+
+</html>

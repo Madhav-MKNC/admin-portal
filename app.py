@@ -21,10 +21,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random key in a production environment
 # app.secret_key = str(unique_id()).replace("-","")
 
-# URL to the chatbot
-CHATBOT_URL = "http://localhost:8081"
-print(f"\n[+] Chatbot URL is: {CHATBOT_URL}\n")
-
 # this server address
 HOST = "0.0.0.0"
 PORT = 50017
@@ -192,12 +188,8 @@ def delete(filename):
 
 # chatbot
 @app.route('/chatbot')
-def chatbot_redirect():
-    if not valid_url(CHATBOT_URL):
-        error = f'Unable to reach chatbot url = {CHATBOT_URL}'
-        flash(error)
-        return render_template('index.html')
-    return redirect(CHATBOT_URL)
+def chat():
+    return render_template('chat.html')
 
 
 # logout

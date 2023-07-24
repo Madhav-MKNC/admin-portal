@@ -170,62 +170,8 @@ def list_files():
 
 
 
-############## Question Answering ##############
-
-# using OpenAI llm
-llm = OpenAI(temperature=0.3, presence_penalty=0.6)
-
-# custom prompt
-GENIEPROMPT = """
-You are an Ecommerce expert/mentor. Your users are beginners in this field.
-You provide accurate and descriptive answers to user questions, after and only researching through the input documents and the context provided to you.
-Just output 'No relevant data found' if the query is irrelevant to the context provided even if the query is very common.
-Do not forget if the query if not relevant with the context and input documents you have then just output 'No relevant data found', this is very important.
-Provide additional descriptions of any complex terms being used in the response \n\nUser: {question}\n\nAi: 
-"""
-
-prompt_template = PromptTemplate.from_template(GENIEPROMPT)
-
-# chain
-chain = load_qa_chain(
-    llm=llm,
-    chain_type="stuff",
-    verbose=False
-)
-
-
-# for searching relevant docs
-docsearch = Pinecone.from_existing_index(
-    index_name,
-    embeddings
-)
-
-# query index
-def get_response(query):
-    docs = docsearch.similarity_search(
-        query=query,
-        namespace=NAMESPACE
-    )
-
-    # # debugging
-    # for i in docs:
-    #     mknc()
-    #     for j in i:
-    #         mknc(j)
-    #     mknc()
-
-    if not docs:
-        return "No relevant data found."
-    
-    response = chain(
-        {
-            "input_documents": docs,
-            "question": prompt_template.format(question=query)
-        },
-        return_only_outputs=True
-    )
-
-    return response["output_text"]
+############## CHATBOT ##############
+from chatbot import get_response
 
 
 
