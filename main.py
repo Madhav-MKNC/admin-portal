@@ -7,12 +7,14 @@ from os import system as cmd
 
 # run app.py
 def main():
+    print("[booting...]")
     from app import start_server
     print("[GOING ONLINE...]")
     start_server()
 
 # install dependencies
-def install():
+def install(err):
+    print("[error]",err)
     print("[*] Installing the Requirements")
     cmd("pip install -r requirements.txt")
     
@@ -20,10 +22,8 @@ def install():
 if __name__ == "__main__":
     try:
         main()
-    except ModuleNotFoundError:
-        install()
-    except ImportError:
-        install()
+    except ImportError as e:
+        install(e)
     except KeyboardInterrupt:
         print("\n[exitted]")
 

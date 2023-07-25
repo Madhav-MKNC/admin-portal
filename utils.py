@@ -66,36 +66,33 @@ def handle_urls(url):
 
 
 
-# # # GOOGLE DRIVE OPERATIONS 
+# # GOOGLE DRIVE OPERATIONS 
 
-# # The scopes required for accessing Google Drive files
-# REDIRECT_URIS = [
-#     "http://localhost:80/oauth2callback",
-#     "http://localhost/oauth2callback"
-# ]
-# JAVASCRIPT_ORIGINS = [
-#     "http://localhost:80",
-#     "http://localhost"
-# ]
-# SCOPES = ['https://www.googleapis.com/auth/drive.file']
-# flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-# credentials = flow.run_local_server(port=0)
+PATH = "./client_secret.json"
+with open(PATH, "r") as json_file:
+    content = json.load(json_file)
 
-# # Function to upload file to Google Drive
-# def upload_to_google_drive(file_path):
-#     service = build('drive', 'v3', credentials=credentials)
+REDIRECT_URIS = content["web"]["redirect_uris"]
+JAVASCRIPT_ORIGINS = content["web"]["javascript_origins"]
+SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
+flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+credentials = flow.run_local_server(port=0)
 
-#     file_metadata = {'name': os.path.basename(file_path)}
-#     media = MediaFileUpload(file_path, resumable=True)
+# Function to upload file to Google Drive
+def upload_to_google_drive(file_path):
+    service = build('drive', 'v3', credentials=credentials)
 
-#     file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-#     return file.get('id')
+    file_metadata = {'name': os.path.basename(file_path)}
+    media = MediaFileUpload(file_path, resumable=True)
 
-# # Function to handle Google Drive authentication
-# def authenticate_google_drive(session):
-#     creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
-#     drive_service = build("drive", "v3", credentials=creds)
-#     return drive_service
+    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    return file.get('id')
+
+# Function to handle Google Drive authentication
+def authenticate_google_drive(session):
+    creds = Credentials.from_authorized_user(session.get("credentials"), SCOPES)
+    drive_service = build("drive", "v3", credentials=creds)
+    return drive_service
 
 
 

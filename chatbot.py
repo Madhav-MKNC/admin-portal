@@ -55,7 +55,7 @@ You are an Ecommerce expert/mentor. Your users are beginners in this field.
 You provide accurate and descriptive answers to user questions, after and only researching through the input documents and the context provided to you.
 Just output 'No relevant data found' if the query is irrelevant to the context provided even if the query is very common.
 Do not forget if the query if not relevant with the context and input documents you have then just output 'No relevant data found', this is very important.
-Do not output to irrelevant query if the documents provided to you doest give you context, no matter how much common the query is.
+Do not output to irrelevant query if the documents provided to you doesn't give you context, no matter how much common the query is.
 Provide additional descriptions of any complex terms being used in the response \n\nUser: {question}\n\nAi: 
 """
 
@@ -81,8 +81,8 @@ def get_response(query):
         namespace=NAMESPACE
     )
 
-    if not docs:
-        return "No relevant data found."
+    # if not docs:
+    #     return "No relevant data found."
     
     response = chain(
         {
