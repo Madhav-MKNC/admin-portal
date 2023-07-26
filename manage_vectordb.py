@@ -8,6 +8,9 @@ load_dotenv()
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 
+from chatbot import index, index_name, NAMESPACE, embeddings
+from chatbot import get_response
+
 import pinecone
 from langchain.vectorstores import Pinecone
 
@@ -21,27 +24,30 @@ from langchain.document_loaders import (
 from langchain.text_splitter import CharacterTextSplitter
 
 
-#####################################################
-# HELPER FUNCTIONS
+############## HELPER FUNCTIONS ##############
 
-# ignore this is helper function used for debugging
+# function used for debugging
 x_x_x = 0 
 def mknc(text=''):
     global x_x_x
     print("\033[31m", x_x_x, "\033[96m", text, "\u001b[37m")
     x_x_x += 1
 
+# listing of files available in the db 
 TOTAL_IDS = ".stored_files.json"
 
+# reading list
 def read_all_files():
     with open(TOTAL_IDS, "r") as json_file:
         files = json.load(json_file)
         return list(files)
 
+# overwriting list
 def write_all_files(files):
     with open(TOTAL_IDS, "w") as json_file:
         json.dump(files, json_file)
 
+# updating list
 def update_read_all_files_list(add_file="", remove_file=""):
     files = read_all_files()
     
@@ -51,28 +57,29 @@ def update_read_all_files_list(add_file="", remove_file=""):
         files.remove(remove_file)
         
     write_all_files(files)
-#####################################################
 
 
-# Initialize pinecone
-print("[*] Initializing pinecone...\n")
-pinecone.init(
-    api_key=os.environ["PINECONE_API_KEY"],
-    environment=os.environ["PINECONE_ENV"]
-)
+############## Initializing ##############
 
-index_name = os.environ["PINECONE_INDEX_NAME"]
-print("[+] Index name:\n",index_name)
+# # Initialize pinecone
+# print("[*] Initializing pinecone...\n")
+# pinecone.init(
+#     api_key=os.environ["PINECONE_API_KEY"],
+#     environment=os.environ["PINECONE_ENV"]
+# )
 
-NAMESPACE = "madhav"
-print("[+] Namespace:",NAMESPACE)
+# index_name = os.environ["PINECONE_INDEX_NAME"]
+# print("[+] Index name:\n",index_name)
 
-# connecting to the index
-index = pinecone.GRPCIndex(index_name)
-print(index.describe_index_stats())
+# NAMESPACE = "madhav"
+# print("[+] Namespace:",NAMESPACE)
 
-# embeddings
-embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
+# # connecting to the index
+# index = pinecone.GRPCIndex(index_name)
+# print(index.describe_index_stats())
+
+# # embeddings
+# embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
 
 
 # load and split documents
@@ -99,7 +106,9 @@ def load_and_split_document(file_path, isurl=False):
     return docs
 
 
-# INDEXING
+############## INDEXING ##############
+
+# Upload a file to the db
 def add_file(file_name, isurl=False):
     # checking if this file already exists
     files = read_all_files()
@@ -132,8 +141,7 @@ def add_file(file_name, isurl=False):
     status = "ok"
     return status
     
-
-# delete all the vectors from a specific file specified by metadata
+# Delete all the vectors for a specific file specified by metadata from the db
 def delete_file(file):
     index.delete(
         filter={
@@ -163,11 +171,7 @@ def list_files():
     return sources
 
 
-
 ############## CHATBOT ##############
-from chatbot import get_response
-
-
 
 # command line interface for bot
 def cli_run():

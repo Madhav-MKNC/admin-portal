@@ -14,17 +14,6 @@ import pinecone
 from langchain.vectorstores import Pinecone
 
 
-#####################################################
-# HELPER FUNCTIONS
-# ignore this is helper function used for debugging
-x_x_x = 0 
-def mknc(text=''):
-    global x_x_x
-    print("\033[31m", x_x_x, "\033[96m", text, "\u001b[37m")
-    x_x_x += 1
-#####################################################
-
-
 # Initialize pinecone
 print("[*] Initializing pinecone...\n")
 pinecone.init(
