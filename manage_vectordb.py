@@ -2,16 +2,10 @@
 # managing the Pinecone vector database
 
 import json
-import os 
-from dotenv import load_dotenv
-load_dotenv()
-
-from langchain.embeddings.openai import OpenAIEmbeddings
 
 from chatbot import index, index_name, NAMESPACE, embeddings
 from chatbot import get_response
 
-import pinecone
 from langchain.vectorstores import Pinecone
 
 from langchain.document_loaders import ( 
@@ -59,28 +53,7 @@ def update_read_all_files_list(add_file="", remove_file=""):
     write_all_files(files)
 
 
-############## Initializing ##############
-
-# # Initialize pinecone
-# print("[*] Initializing pinecone...\n")
-# pinecone.init(
-#     api_key=os.environ["PINECONE_API_KEY"],
-#     environment=os.environ["PINECONE_ENV"]
-# )
-
-# index_name = os.environ["PINECONE_INDEX_NAME"]
-# print("[+] Index name:\n",index_name)
-
-# NAMESPACE = "madhav"
-# print("[+] Namespace:",NAMESPACE)
-
-# # connecting to the index
-# index = pinecone.GRPCIndex(index_name)
-# print(index.describe_index_stats())
-
-# # embeddings
-# embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
-
+############## Documents ##############
 
 # load and split documents
 def load_and_split_document(file_path, isurl=False):

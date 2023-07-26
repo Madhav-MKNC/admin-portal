@@ -69,9 +69,6 @@ def get_response(query):
         query=query,
         namespace=NAMESPACE
     )
-
-    # if not docs:
-    #     return "No relevant data found."
     
     response = chain(
         {

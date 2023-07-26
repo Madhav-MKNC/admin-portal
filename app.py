@@ -39,29 +39,29 @@ def login_required(f):
     return decorated_function
 
 
-# GOOGLE API AUTHENTICATION
-state = session['state']
-flow = Flow.from_client_secrets_file(
-    'client_secret.json',
-    scopes=['https://www.googleapis.com/auth/drive.metadata.readonly'],
-    state=state)
-flow.redirect_uri = url_for('oauth2callback', _external=True)
+# # GOOGLE API AUTHENTICATION
+# state = session['state']
+# flow = Flow.from_client_secrets_file(
+#     'client_secret.json',
+#     scopes=['https://www.googleapis.com/auth/drive.metadata.readonly'],
+#     state=state)
+# flow.redirect_uri = url_for('oauth2callback', _external=True)
 
-authorization_response = request.url
-flow.fetch_token(authorization_response=authorization_response)
+# authorization_response = request.url
+# flow.fetch_token(authorization_response=authorization_response)
 
-# Store the credentials in the session.
-# ACTION ITEM for developers:
-#     Store user's access and refresh tokens in your data store if
-#     incorporating this code into your real app.
-credentials = flow.credentials
-session['credentials'] = {
-    'token': credentials.token,
-    'refresh_token': credentials.refresh_token,
-    'token_uri': credentials.token_uri,
-    'client_id': credentials.client_id,
-    'client_secret': credentials.client_secret,
-    'scopes': credentials.scopes}
+# # Store the credentials in the session.
+# # ACTION ITEM for developers:
+# #     Store user's access and refresh tokens in your data store if
+# #     incorporating this code into your real app.
+# credentials = flow.credentials
+# session['credentials'] = {
+#     'token': credentials.token,
+#     'refresh_token': credentials.refresh_token,
+#     'token_uri': credentials.token_uri,
+#     'client_id': credentials.client_id,
+#     'client_secret': credentials.client_secret,
+#     'scopes': credentials.scopes}
 
 
 
@@ -147,50 +147,50 @@ def upload():
         return redirect(url_for('dashboard'))
 
 
-# GOOGLE DRIVE route for OAuth 2.0 authorization
-@app.route('/login_google_drive')
-def login_google_drive():
-    auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline', redirect_uri=REDIRECT_URIS[0])
-    return redirect(auth_url)
+# # GOOGLE DRIVE route for OAuth 2.0 authorization
+# @app.route('/login_google_drive')
+# def login_google_drive():
+#     auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline', redirect_uri=REDIRECT_URIS[0])
+#     return redirect(auth_url)
 
 
-# GOOGLE DRIVE Callback route for handling OAuth 2.0 response
-@app.route('/oauth2callback')
-def oauth2callback():
-    flow.fetch_token(authorization_response=request.url)
-    session['credentials'] = flow.credentials.to_json()
-    return redirect(url_for('dashboard'))
+# # GOOGLE DRIVE Callback route for handling OAuth 2.0 response
+# @app.route('/oauth2callback')
+# def oauth2callback():
+#     flow.fetch_token(authorization_response=request.url)
+#     session['credentials'] = flow.credentials.to_json()
+#     return redirect(url_for('dashboard'))
 
 
-# UPLOAD FILES from google drive
-@app.route('/upload_google_drive', methods=['POST'])
-@login_required
-def upload_google_drive():
-    try:
-        if 'file' not in request.files:
-            flash('No file selected')
-            return redirect(url_for('dashboard'))
+# # GOOGLE DRIVE upload files
+# @app.route('/upload_google_drive', methods=['POST'])
+# @login_required
+# def upload_google_drive():
+#     try:
+#         if 'file' not in request.files:
+#             flash('No file selected')
+#             return redirect(url_for('dashboard'))
 
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(url_for('dashboard'))
+#         file = request.files['file']
+#         if file.filename == '':
+#             flash('No selected file')
+#             return redirect(url_for('dashboard'))
 
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(filename)
+#         if file and allowed_file(file.filename):
+#             filename = secure_filename(file.filename)
+#             file.save(filename)
 
-            drive_service = authenticate_google_drive(session)
-            file_id = upload_to_google_drive(drive_service, filename)
-            flash(f'File uploaded to Google Drive with ID: {file_id}')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid file type')
-            return redirect(url_for('dashboard'))
+#             drive_service = authenticate_google_drive(session)
+#             file_id = upload_to_google_drive(drive_service, filename)
+#             flash(f'File uploaded to Google Drive with ID: {file_id}')
+#             return redirect(url_for('dashboard'))
+#         else:
+#             flash('Invalid file type')
+#             return redirect(url_for('dashboard'))
 
-    except Exception as e:
-        flash(f'Error uploading to Google Drive: {str(e)}')
-        return redirect(url_for('dashboard'))
+#     except Exception as e:
+#         flash(f'Error uploading to Google Drive: {str(e)}')
+#         return redirect(url_for('dashboard'))
 
 
 
