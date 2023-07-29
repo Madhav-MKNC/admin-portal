@@ -6,6 +6,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.utils import secure_filename
 
+from flask_cors import CORS
 from google_auth_oauthlib.flow import Flow
 
 from utils import *
@@ -16,9 +17,11 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-
 # Initialzing flask app
 app = Flask(__name__)
+
+# Enable CORS
+CORS(app)
 
 # secret key
 app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random key in a production environment
@@ -43,7 +46,7 @@ def login_required(f):
 # state = session['state']
 # flow = Flow.from_client_secrets_file(
 #     'client_secret.json',
-#     scopes=['https://www.googleapis.com/auth/drive.metadata.readonly'],
+#     scopes=['https://www.googleapis.com/auth/drive.readonly'],
 #     state=state)
 # flow.redirect_uri = url_for('oauth2callback', _external=True)
 
@@ -62,6 +65,9 @@ def login_required(f):
 #     'client_id': credentials.client_id,
 #     'client_secret': credentials.client_secret,
 #     'scopes': credentials.scopes}
+# flow = Flow.from_client_secrets_file('client_secret.json', SCOPES)
+# flow.redirect_uri = REDIRECT_URI
+
 
 
 
@@ -146,6 +152,14 @@ def upload():
         flash('Files uploaded successfully')
         return redirect(url_for('dashboard'))
 
+# # GOOGLE DRIVE process files
+# @app.route('/process_file_id', methods=['POST'])
+# @login_required
+# def process_file_id():
+#     file_id = request.json.get('file_id')
+#     # TODO: Your server side code to process files
+#     print(file_id)
+#     return jsonify({'message': 'File ID received'})
 
 # # GOOGLE DRIVE route for OAuth 2.0 authorization
 # @app.route('/login_google_drive')
@@ -153,6 +167,10 @@ def upload():
 #     auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline', redirect_uri=REDIRECT_URIS[0])
 #     return redirect(auth_url)
 
+# @app.route('/login_google_drive')
+# def login_google_drive():
+#     auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline')
+#     return redirect(auth_url)
 
 # # GOOGLE DRIVE Callback route for handling OAuth 2.0 response
 # @app.route('/oauth2callback')
