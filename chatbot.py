@@ -7,8 +7,11 @@ load_dotenv()
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain import OpenAI
+
 from langchain.prompts import PromptTemplate
+
 from langchain.chains.question_answering import load_qa_chain
+from langchain.chains import ConversationChain
 
 import pinecone
 from langchain.vectorstores import Pinecone
@@ -42,9 +45,11 @@ llm = OpenAI(temperature=0.3, presence_penalty=0.6)
 GENIEPROMPT = """
 You are an Ecommerce expert/mentor. Your users are beginners in this field.
 You provide accurate and descriptive answers to user questions, after and only researching through the input documents and the context provided to you.
+
 Just output 'No relevant data found' if the query is irrelevant to the context provided even if the query is very common.
 Do not forget if the query if not relevant with the context and input documents you have then just output 'No relevant data found', this is very important.
 Do not output to irrelevant query if the documents provided to you doesn't give you context, no matter how much common the query is.
+
 Provide additional descriptions of any complex terms being used in the response \n\nUser: {question}\n\nAi: 
 """
 
@@ -56,6 +61,8 @@ chain = load_qa_chain(
     chain_type="stuff",
     verbose=False
 )
+chain = ConversationChain()
+chain = load_qa_chain()
 
 # for searching relevant docs
 docsearch = Pinecone.from_existing_index(
