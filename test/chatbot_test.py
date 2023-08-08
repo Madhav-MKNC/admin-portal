@@ -1,5 +1,6 @@
-# author: Madhav (https://github.com/madhav-mknc)
-# managing the Pinecone vector database
+# /temp /test scripts
+
+print("Booting script...")
 
 import os 
 from dotenv import load_dotenv
@@ -16,24 +17,16 @@ from langchain.chains import ConversationChain
 import pinecone
 from langchain.vectorstores import Pinecone
 
+from langchain.callbacks import get_openai_callback
 
-# Initialize pinecone
-print("[*] Initializing pinecone...\n")
+
+# vector database
 pinecone.init(
     api_key=os.environ["PINECONE_API_KEY"],
     environment=os.environ["PINECONE_ENV"]
 )
-
 index_name = os.environ["PINECONE_INDEX_NAME"]
-print("[+] Index name:\n",index_name)
-
-NAMESPACE = "madhav"
-print("[+] Namespace:",NAMESPACE)
-
-# connecting to the index
 index = pinecone.GRPCIndex(index_name)
-print(index.describe_index_stats())
-
 
 # embeddings
 embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
@@ -77,14 +70,36 @@ docsearch = Pinecone.from_existing_index(
 def get_response(query, chat_history=[]):
     docs = docsearch.similarity_search(
         query=query,
-        namespace=NAMESPACE
+        namespace="madhav"
     )
 
     prompt = {
         "input_documents": docs,
         "question": prompt_template.format(question=query, history=chat_history)
     }
-    
-    response = chain(prompt, return_only_outputs=True)
+    print(prompt)
 
+    response = chain(prompt, return_only_outputs=True)
     return response["output_text"]
+
+# check tokens for each call
+def cli_run():
+    try:
+        while True:
+            query = input("\033[0;39m\n[HUMAN] ").strip()
+            if not query: continue
+
+            with get_openai_callback() as cb:
+                response = get_response(query)
+            
+            print("\033[0;32m[AI]",response)
+            print("\033[31m[USAGE]",cb)
+    except KeyboardInterrupt:
+        print("\033[31mStopped")
+    print("\u001b[37m")
+
+
+
+# main
+if __name__ == "__main__":
+    cli_run()
