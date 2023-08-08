@@ -237,7 +237,8 @@ def delete(filename):
 @app.route('/get_chat_response', methods=['POST'])
 def get_chat_response():
     user_input = request.json['message']
-    response = chatbot.get_response(query=user_input)
+    chat_history = request.json['conversationHistory']
+    response = chatbot.get_response(query=user_input, chat_history=chat_history)
     return jsonify({'message': response})
 
 # chatbot

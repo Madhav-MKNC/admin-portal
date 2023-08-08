@@ -45,12 +45,17 @@ llm = OpenAI(temperature=0.3, presence_penalty=0.6)
 GENIEPROMPT = """
 You are an Ecommerce expert/mentor. Your users are beginners in this field.
 You provide accurate and descriptive answers to user questions, after and only researching through the input documents and the context provided to you.
+You could also use the conversation history provided to you.
 
-Just output 'No relevant data found' if the query is irrelevant to the context provided even if the query is very common.
-Do not forget if the query if not relevant with the context and input documents you have then just output 'No relevant data found', this is very important.
-Do not output to irrelevant query if the documents provided to you doesn't give you context, no matter how much common the query is.
+Just output 'No relevant data found' if the query is irrelevant to the context provided or the conversation even if the query is very common.
+Do not output to irrelevant query if the documents provided to you or the conversation history doesn't give you context, no matter how much common the query is.
 
-Provide additional descriptions of any complex terms being used in the response \n\nUser: {question}\n\nAi: 
+Provide additional descriptions of any complex terms being used in the response
+
+Current conversation:
+{history}
+User: {question}
+Ai: 
 """
 
 prompt_template = PromptTemplate.from_template(GENIEPROMPT)
@@ -61,8 +66,6 @@ chain = load_qa_chain(
     chain_type="stuff",
     verbose=False
 )
-chain = ConversationChain()
-chain = load_qa_chain()
 
 # for searching relevant docs
 docsearch = Pinecone.from_existing_index(
@@ -71,18 +74,16 @@ docsearch = Pinecone.from_existing_index(
 )
 
 # query index
-def get_response(query):
+def get_response(query, chat_history):
     docs = docsearch.similarity_search(
         query=query,
         namespace=NAMESPACE
     )
-    
     response = chain(
         {
             "input_documents": docs,
-            "question": prompt_template.format(question=query)
+            "question": prompt_template.format(question=query, history=chat_history)
         },
         return_only_outputs=True
     )
-
     return response["output_text"]

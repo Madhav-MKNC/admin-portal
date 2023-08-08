@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT-like Interface</title>
+    <title>Chatbot
+    </title>
     <link rel="stylesheet" href="{{ url_for('static', filename='chat_style.css') }}">
 </head>
 
@@ -21,9 +22,11 @@
             <!-- Chat messages will be added dynamically here -->
         </div>
         <div class="user-input">
-            <input type="text" id="userInput" placeholder="Type your message..." , onkeyup="handleKeyPress(event)"
-                autofocus>
-            <button id="sendButton" onclick="handleKeyPress()">Send</button>
+            <!-- <input type="text" id="userInput" placeholder="Type your message..." , onkeyup="handleKeyPress(event)" autofocus>
+            <button id="sendButton" onclick="handleKeyPress()">Send</button> -->
+            
+            <input type="text" id="userInput" placeholder="Type your message..." onkeyup="handleKeyPress(event)" autofocus>
+            <button id="sendButton" onclick="sendMessage()">Send</button>
         </div>
     </div>
 

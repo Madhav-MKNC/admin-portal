@@ -1,11 +1,19 @@
-// JavaScript code
+let conversationHistory = [];
+
 function appendMessage(message, fromUser) {
     const chatBox = document.getElementById('chatBox');
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message ' + (fromUser ? 'from-user' : 'from-chatbot');
     messageDiv.innerHTML = `<p>${message}</p>`;
+
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+
+    // Update conversation history
+    conversationHistory.push({
+        user: fromUser,
+        message: message
+    });
 }
 
 let sendingMessage = false;
@@ -30,12 +38,21 @@ function sendMessage() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userInput }),
+        body: JSON.stringify({ 
+            message: userInput, 
+            conversationHistory: conversationHistory 
+        }), // Include conversation history
     })
         .then(response => response.json())
         .then(data => {
             const chatbotResponse = data.message;
             appendMessage(chatbotResponse, false);
+            
+            // Update conversation history
+            conversationHistory.push({
+                fromUser: false,
+                message: chatbotResponse
+            });
 
             // Enable the input field after the response is received
             document.getElementById('userInput').disabled = false;
@@ -54,4 +71,11 @@ function handleKeyPress(event) {
     if (event.key === 'Enter') {
         sendMessage();
     }
+}
+
+// Example: Print the entire conversation history (if needed)
+function printConversation() {
+    conversationHistory.forEach(entry => {
+        console.log(`From User: ${entry.fromUser}, Message: ${entry.message}`);
+    });
 }
