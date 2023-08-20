@@ -6,7 +6,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.utils import secure_filename
 
+from waitress import serve
 from flask_cors import CORS
+
 from google_auth_oauthlib.flow import Flow
 
 from utils import *
@@ -257,8 +259,7 @@ def logout():
 
 # run server
 def start_server():
-    app.run(host=HOST, port=PORT, debug=True)
-
+    serve(app, host=HOST, port=PORT)
 
 if __name__ == '__main__':
     start_server()

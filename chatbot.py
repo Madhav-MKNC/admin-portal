@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langchain.embeddings.openai import OpenAIEmbeddings
+
 from langchain import OpenAI
+from langchain.chat_models import ChatOpenAI
 
 from langchain.prompts import PromptTemplate
 
 from langchain.chains.question_answering import load_qa_chain
-from langchain.chains import ConversationChain
 
 import pinecone
 from langchain.vectorstores import Pinecone
@@ -38,23 +39,25 @@ print(index.describe_index_stats())
 # embeddings
 embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
 
-# using OpenAI llm
-llm = OpenAI(temperature=0.3, presence_penalty=0.6)
+# llm
+# llm = OpenAI(
+llm = ChatOpenAI(
+    temperature=0.3,
+    presence_penalty=0.6,
+    model='gpt-4'
+)
 
 # custom prompt
 GENIEPROMPT = """
-You are an Ecommerce expert/mentor. Your users are beginners in this field.
-You provide accurate and descriptive answers to user questions, after and only researching through the input documents and the context provided to you.
-You could also use the conversation history provided to you.
+You are an assistant you provide accurate and descriptive answers to user questions, after and only researching through the context provided to you.
+You have to answer based on the context or the conversation history provided, or else just output '-- No relevant data --'.
+Please do not output to irrelevant query if the information provided to you doesn't give you context.
+You will also use the conversation history provided to you.
 
-Just output 'No relevant data found' if the query is irrelevant to the context provided or the conversation even if the query is very common.
-Do not output to irrelevant query if the documents provided to you or the conversation history doesn't give you context, no matter how much common the query is.
-
-Provide additional descriptions of any complex terms being used in the response
-
-Current conversation:
+Conversation history:
 {history}
-User: {question}
+User:
+{question}
 Ai: 
 """
 
@@ -82,9 +85,14 @@ def get_response(query, chat_history=[]):
 
     prompt = {
         "input_documents": docs,
-        "question": prompt_template.format(question=query, history=chat_history)
+        "question": prompt_template.format(
+            question=query, 
+            history=chat_history
+        )
     }
     
-    response = chain(prompt, return_only_outputs=True)
+    response = chain(
+        prompt,
+        return_only_outputs=True)
 
     return response["output_text"]

@@ -18,3 +18,4 @@ pathlib
 docx2txt
 tqdm
 python-dotenv
+waitress
