@@ -48,11 +48,11 @@ function sendMessage() {
             const chatbotResponse = data.message;
             appendMessage(chatbotResponse, false);
             
-            // Update conversation history
-            conversationHistory.push({
-                fromUser: false,
-                message: chatbotResponse
-            });
+            // // Update conversation history [why the hell is this part here??]
+            // conversationHistory.push({
+            //     fromUser: false,
+            //     message: chatbotResponse
+            // });
 
             // Enable the input field after the response is received
             document.getElementById('userInput').disabled = false;

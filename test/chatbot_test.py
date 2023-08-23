@@ -36,18 +36,15 @@ llm = OpenAI(temperature=0.3, presence_penalty=0.6)
 
 # custom prompt
 GENIEPROMPT = """
-You are an Ecommerce expert/mentor. Your users are beginners in this field.
-You provide accurate and descriptive answers to user questions, after and only researching through the input documents and the context provided to you.
-You could also use the conversation history provided to you.
+You are an assistant you provide accurate and descriptive answers to user questions, after and only researching through the context provided to you.
+You have to answer based on the context or the conversation history provided, or else just output '-- No relevant data --'.
+Please do not output to irrelevant query if the information provided to you doesn't give you context.
+You will also use the conversation history provided to you.
 
-Just output 'No relevant data found' if the query is irrelevant to the context provided or the conversation even if the query is very common.
-Do not output to irrelevant query if the documents provided to you or the conversation history doesn't give you context, no matter how much common the query is.
-
-Provide additional descriptions of any complex terms being used in the response
-
-Current conversation:
+Conversation history:
 {history}
-User: {question}
+User:
+{question}
 Ai: 
 """
 
@@ -77,7 +74,17 @@ def get_response(query, chat_history=[]):
         "input_documents": docs,
         "question": prompt_template.format(question=query, history=chat_history)
     }
-    print(prompt)
+    
+    # # debugging
+    # print(prompt)
+    print("GENIEPROMPT:")
+    print(GENIEPROMPT)
+    print("INPUT DOCUMENTS:")
+    for i, doc in enumerate(prompt['input_documents']):
+        print(f"[{i}] {doc}")
+    print("CHAT HISTORY:")
+    for i in chat_history:
+        print(i)
 
     response = chain(prompt, return_only_outputs=True)
     return response["output_text"]

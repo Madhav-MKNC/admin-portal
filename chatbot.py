@@ -40,11 +40,11 @@ print(index.describe_index_stats())
 embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
 
 # llm
-# llm = OpenAI(
-llm = ChatOpenAI(
+# llm = ChatOpenAI(
+#     model='gpt-4',
+llm = OpenAI(
     temperature=0.3,
-    presence_penalty=0.6,
-    model='gpt-4'
+    presence_penalty=0.6 
 )
 
 # custom prompt

@@ -29,7 +29,7 @@ CORS(app)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Change this to a strong random key in a production environment
 # app.secret_key = str(unique_id()).replace("-","")
 
-# this server address
+# server address
 HOST = "0.0.0.0"
 PORT = 8080
 
@@ -240,6 +240,17 @@ def delete(filename):
 def get_chat_response():
     user_input = request.json['message']
     chat_history = request.json['conversationHistory']
+
+    # truncate the chat_history
+    chat_history.reverse()
+    conversation = []
+    for chat in chat_history:
+        if len(str(conversation)) > 2000:
+            break 
+        conversation.append(chat)
+        print(chat)
+    chat_history = conversation[::-1]
+
     response = chatbot.get_response(query=user_input, chat_history=chat_history)
     return jsonify({'message': response})
 
