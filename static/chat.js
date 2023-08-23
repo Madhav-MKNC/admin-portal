@@ -10,10 +10,9 @@ function appendMessage(message, fromUser) {
     chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
 
     // Update conversation history
-    conversationHistory.push({
-        user: fromUser,
-        message: message
-    });
+    conversationHistory.push(
+        `${fromUser ? 'user' : 'assistant'}: ${message}`
+    );
 }
 
 let sendingMessage = false;
@@ -47,12 +46,6 @@ function sendMessage() {
         .then(data => {
             const chatbotResponse = data.message;
             appendMessage(chatbotResponse, false);
-            
-            // // Update conversation history [why the hell is this part here??]
-            // conversationHistory.push({
-            //     fromUser: false,
-            //     message: chatbotResponse
-            // });
 
             // Enable the input field after the response is received
             document.getElementById('userInput').disabled = false;

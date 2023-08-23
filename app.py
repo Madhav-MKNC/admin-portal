@@ -245,11 +245,12 @@ def get_chat_response():
     chat_history.reverse()
     conversation = []
     for chat in chat_history:
-        if len(str(conversation)) > 2000:
+        if len(str(conversation)) > 2000: # 2000 characters is the currect limit
             break 
         conversation.append(chat)
-        print(chat)
     chat_history = conversation[::-1]
+    for i in chat_history:
+        print(i)
 
     response = chatbot.get_response(query=user_input, chat_history=chat_history)
     return jsonify({'message': response})

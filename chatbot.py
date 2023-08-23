@@ -90,6 +90,7 @@ def get_response(query, chat_history=[]):
             history=chat_history
         )
     }
+    print(prompt)
     
     response = chain(
         prompt,
