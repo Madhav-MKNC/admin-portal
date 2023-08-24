@@ -22,7 +22,7 @@ def install(err):
 if __name__ == "__main__":
     try:
         main()
-    except ImportError as e:
+    except ModuleNotFoundError as e:
         install(e)
     except KeyboardInterrupt:
         print("\n[exitted]")

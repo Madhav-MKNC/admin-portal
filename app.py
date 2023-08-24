@@ -5,6 +5,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.utils import secure_filename
+from functools import wraps
 
 from waitress import serve
 from flask_cors import CORS
@@ -13,7 +14,6 @@ from google_auth_oauthlib.flow import Flow
 
 from utils import *
 import chatbot
-from functools import wraps
 
 import os
 from dotenv import load_dotenv
@@ -79,6 +79,7 @@ def login_required(f):
 /login      => admin login page
 /dashboard  => admin dashboard
 /upload     => for uploading files
+/handle_url => fetch data from URLs
 /delete     => for deleting a uploaded file
 /chatbot    => redirect to chatbot
 /get_chat_response => for fetching response from the chatbot
