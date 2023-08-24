@@ -50,8 +50,6 @@ llm = OpenAI(
 # custom prompt
 GENIEPROMPT = """
 You are an assistant you provide accurate and descriptive answers to user questions, after and only researching through the context provided to you.
-You have to answer based on the context or the conversation history provided, or else just output '-- No relevant data --'.
-Please do not output to irrelevant query if the information provided to you doesn't give you context.
 You will also use the conversation history provided to you.
 
 Conversation history:
@@ -90,7 +88,6 @@ def get_response(query, chat_history=[]):
             history=chat_history
         )
     }
-    print(prompt)
     
     response = chain(
         prompt,

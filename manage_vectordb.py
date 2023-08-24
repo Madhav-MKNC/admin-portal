@@ -136,6 +136,9 @@ def reset_index():
         delete_all=True
     )
 
+    # update files list (which is maintained locally)
+    write_all_files(files=[])
+
 # list source files
 def list_files():
     # stats = index.describe_index_stats()
@@ -151,11 +154,11 @@ def cli_run():
     try:
         while True:
             query = input("\033[0;39m\n[HUMAN] ").strip()
+
             if query == ".stats":
                 print("\033[93m[SYSTEM]",index.describe_index_stats())
             elif query == ".reset_index":
                 reset_index()
-                write_all_files(files=[])
                 print("\033[93m[SYSTEM] deleting index...")
             elif query == ".exit":
                 print("\033[93m[SYSTEM] exitting...")
@@ -165,6 +168,7 @@ def cli_run():
                 print("\033[0;32m[AI]",response)
             else:
                 pass
+            
     except KeyboardInterrupt:
         print("\033[31mStopped")
     print("\u001b[37m")

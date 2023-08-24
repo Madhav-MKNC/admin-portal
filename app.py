@@ -249,8 +249,8 @@ def get_chat_response():
             break 
         conversation.append(chat)
     chat_history = conversation[::-1]
-    for i in chat_history:
-        print(i)
+    # for i in chat_history:
+    #     print(i)
 
     response = chatbot.get_response(query=user_input, chat_history=chat_history)
     return jsonify({'message': response})
