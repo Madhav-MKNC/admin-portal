@@ -1,6 +1,8 @@
 # author: Madhav (https://github.com/madhav-mknc)
 # utilties / helper functions for app.py
 
+from utils.manage_vectordb import add_file, delete_file, list_files
+
 import os
 import sys
 import json
@@ -9,13 +11,11 @@ import hashlib
 from urllib.parse import urlparse
 import requests
 
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import Flow
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
-
-from manage_vectordb import add_file, delete_file, list_files
+# from google.oauth2.credentials import Credentials
+# from google_auth_oauthlib.flow import Flow
+# from google_auth_oauthlib.flow import InstalledAppFlow
+# from googleapiclient.discovery import build
+# from googleapiclient.http import MediaFileUpload
 
 
 # Load admin users from the JSON file

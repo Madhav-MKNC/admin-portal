@@ -3,11 +3,10 @@
 
 import json
 
-from chatbot import index, index_name, NAMESPACE, embeddings
-from chatbot import get_response
+from utils.chatbot import index, index_name, NAMESPACE, embeddings
+from utils.chatbot import get_response
 
 from langchain.vectorstores import Pinecone
-
 from langchain.document_loaders import ( 
     PyMuPDFLoader, 
     TextLoader,
